@@ -1,22 +1,16 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-
-    <b-container>
-      <b-card header="Some card">Here is a Bootstrap-vue card</b-card>
-    </b-container>
-
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <dashboard/>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue';
+import Dashboard from "@/components/Dashboard";
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    Dashboard,
   },
 };
 </script>
@@ -28,6 +22,5 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
 }
 </style>
