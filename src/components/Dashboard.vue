@@ -45,7 +45,45 @@ import AppHeader from "@/components/AppHeader";
 
 export default {
   name: "Dashboard",
+
   components: {AppHeader, AppFooter, Emission, TimeControls, EmissionExcerpt, WorldMap, Selectors},
+
+  data() {
+    return {
+      data: {
+        emission: null,
+        covid: null,
+      },
+      emissionLoaded: false,
+      covidLoaded: false,
+
+      settings: {},
+    };
+  },
+
+  mounted() {
+    this.loadData();
+  },
+
+  methods: {
+    /**
+     * Load the datasets
+     */
+    loadData() {
+      // Async loading of emission data
+      fetch("data/emission.json")
+          .then(response => {
+            this.data.emission = response.json();
+            this.emissionLoaded = true;
+          });
+      // Async loading of covid data
+      fetch("data/emission.json") // TODO Switch to covid.json once that's present
+          .then(response => {
+            this.data.covid = response.json();
+            this.covidLoaded = true;
+          });
+    },
+  },
 };
 </script>
 
