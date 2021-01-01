@@ -7,10 +7,10 @@
       >
         <b-col align="right">
           <label :for="`selector-${key}`">
-            (Something):
+            {{  setting.label }}:
           </label>
         </b-col>
-        <b-col>
+        <b-col align-self="left" align="left" class="p-0">
           <b-form-select
             :id="`selector-${key}`"
             v-model="setting.selected"

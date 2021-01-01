@@ -17,11 +17,11 @@
           </b-col>
           <!-- World Map -->
           <b-col cols="8" align-h="center">
-            <world-map :data="data" :settings="settings"/>
+            <world-map :data="data" :settings="settings" :time="time"/>
           </b-col>
           <!-- Emission Excerpt -->
           <b-col cols="2" align-h="left">
-            <emission-excerpt :data="data" :settings="settings"/>
+            <emission-excerpt :data="data" :settings="settings" :time="time"/>
           </b-col>
         </b-row>
         <!-- Time Controls -->
@@ -30,7 +30,7 @@
         </b-row>
         <!-- Emission Graph -->
         <b-row align-h="center">
-          <emission :data="data" :settings="settings"/>
+          <emission :data="data" :settings="settings" :time="time"/>
         </b-row>
       </b-col>
     </b-row>
@@ -69,6 +69,7 @@ export default {
       settings: {
         // Split emission on [sector, country]
         emissionSplit: {
+          label: 'Split emission on',
           selected: 'sector',
           options: [
             { value: 'sector', text: "Sector" },
@@ -78,6 +79,7 @@ export default {
 
         // Select covid numbers: [cases, recoveries, deaths]
         covidCount: {
+          label: 'Covid metric',
           selected: 'cases',
           options: [
             { value: 'cases', text: 'Cases' },

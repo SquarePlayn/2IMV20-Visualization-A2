@@ -51,7 +51,7 @@ export default {
 
   mounted() {
     this.time = this.value;
-    this.timer = setInterval(() => this.advanceIfPlaying(), 1000);
+    this.timer = setInterval(() => this.advanceIfPlaying(), 500);
   },
 
   watch: {
