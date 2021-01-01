@@ -1,37 +1,44 @@
 <template>
-  <b-col
-      style="height: 100vh; width: 100vw"
-      class="bg-light"
+  <b-container
+      fluid
+      class="main-container h-100 d-flex flex-column"
   >
+    <!-- Header -->
     <b-row>
       <app-header/>
     </b-row>
-    <b-row>
-      <!-- Main content -->
-      <b-container fluid>
+    <!-- Main content -->
+    <b-row class="flex-grow-1">
+      <b-col>
         <b-row>
+          <!-- Selectors -->
           <b-col cols="2" align-h="right">
             <selectors :settings="settings"/>
           </b-col>
+          <!-- World Map -->
           <b-col cols="8" align-h="center">
             <world-map :data="data" :settings="settings"/>
           </b-col>
+          <!-- Emission Excerpt -->
           <b-col cols="2" align-h="left">
             <emission-excerpt :data="data" :settings="settings"/>
           </b-col>
         </b-row>
+        <!-- Time Controls -->
         <b-row align-h="center">
           <time-controls v-model="time"/>
         </b-row>
+        <!-- Emission Graph -->
         <b-row align-h="center">
           <emission :data="data" :settings="settings"/>
         </b-row>
-      </b-container>
+      </b-col>
     </b-row>
-    <b-row class="justify-content-center">
+    <!-- Footer -->
+    <b-row>
       <app-footer/>
     </b-row>
-  </b-col>
+  </b-container>
 </template>
 
 <script>
@@ -112,5 +119,7 @@ export default {
 </script>
 
 <style scoped>
-
+.main-container {
+  background-color: whitesmoke;
+}
 </style>

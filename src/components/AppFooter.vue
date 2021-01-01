@@ -1,5 +1,5 @@
 <template>
-  <div class="app-footer text-muted">
+  <div class="app-footer text-muted text-center">
     Made by X, Y, Z for TU/e
   </div>
 </template>
