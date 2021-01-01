@@ -10,21 +10,21 @@
       <!-- Main content -->
       <b-container fluid>
         <b-row>
-          <b-col cols="2">
-            <selectors/>
+          <b-col cols="2" align-h="right">
+            <selectors :settings="settings"/>
           </b-col>
-          <b-col cols="8">
-            <world-map/>
+          <b-col cols="8" align-h="center">
+            <world-map :data="data" :settings="settings"/>
           </b-col>
-          <b-col cols="2">
-            <emission-excerpt/>
+          <b-col cols="2" align-h="left">
+            <emission-excerpt :data="data" :settings="settings"/>
           </b-col>
         </b-row>
-        <b-row>
-          <time-controls/>
+        <b-row align-h="center">
+          <time-controls v-model="time"/>
         </b-row>
-        <b-row>
-          <emission/>
+        <b-row align-h="center">
+          <emission :data="data" :settings="settings"/>
         </b-row>
       </b-container>
     </b-row>
@@ -57,7 +57,31 @@ export default {
       emissionLoaded: false,
       covidLoaded: false,
 
-      settings: {},
+      time: 0,
+
+      settings: {
+        // Split emission on [sector, country]
+        emissionSplit: {
+          selected: 'sector',
+          options: [
+            { value: 'sector', text: "Sector" },
+            { value: 'country', text: "Country" },
+          ],
+        },
+
+        // Select covid numbers: [cases, recoveries, deaths]
+        covidCount: {
+          selected: 'cases',
+          options: [
+            { value: 'cases', text: 'Cases' },
+            { value: 'recoveries', text: 'Recoveries' },
+            { value: 'deaths', text: 'Deaths' },
+          ],
+        },
+
+        // Select country (to display emission chart)
+        // TODO
+      },
     };
   },
 

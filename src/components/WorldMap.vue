@@ -1,5 +1,5 @@
 <template>
-  <b-row class="world-map">
+  <b-row cols="8" class="world-map">
     World map will go here.
   </b-row>
 </template>
@@ -12,7 +12,7 @@ export default {
 
 <style scoped>
 .world-map {
-  min-height: 40vh;
+  min-height: 45vh;
   background-color: lightblue;
 }
 </style>

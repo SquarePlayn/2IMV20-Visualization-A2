@@ -1,5 +1,5 @@
 <template>
-  <b-col class="emission-chart">
+  <b-col cols="8" class="emission-chart">
     Emission chart will go here.
   </b-col>
 </template>
@@ -12,7 +12,7 @@ export default {
 
 <style scoped>
 .emission-chart {
-  min-height: 40vh;
+  min-height: 45vh;
   background-color: antiquewhite;
 }
 </style>

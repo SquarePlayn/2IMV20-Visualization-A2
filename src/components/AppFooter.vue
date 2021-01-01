@@ -1,6 +1,6 @@
 <template>
-  <div class="app-footer">
-    This is the footer.
+  <div class="app-footer text-muted">
+    Made by X, Y, Z for TU/e
   </div>
 </template>
 
@@ -13,6 +13,6 @@ export default {
 <style scoped>
 .app-footer {
   width: 100vw;
-  background-color: gray;
+  background-color: lightgray;
 }
 </style>

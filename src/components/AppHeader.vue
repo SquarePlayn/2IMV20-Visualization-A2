@@ -1,6 +1,6 @@
 <template>
   <div class="app-header">
-    This is some header.
+    This is some header. Not sure if we need it
   </div>
 </template>
 
