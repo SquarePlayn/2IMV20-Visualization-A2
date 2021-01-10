@@ -6,7 +6,8 @@
 
 <script>
 export default {
-  name: "Emission"
+  name: "Emission",
+  props: ['data', 'settings', 'time'],
 }
 </script>
 

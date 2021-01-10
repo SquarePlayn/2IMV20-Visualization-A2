@@ -9,7 +9,8 @@
     </b-row>
     <!-- Main content -->
     <b-row class="flex-grow-1">
-      <b-col>
+      <b-spinner v-if="!dataLoaded"/>
+      <b-col v-else>
         <b-row>
           <!-- Selectors -->
           <b-col cols="2" align-h="right">
@@ -57,12 +58,8 @@ export default {
 
   data() {
     return {
-      data: {
-        emission: null,
-        covid: null,
-      },
-      emissionLoaded: false,
-      covidLoaded: false,
+      data: null,
+      dataLoaded: false,
 
       time: 0,
 
@@ -72,8 +69,8 @@ export default {
           label: 'Split emission on',
           selected: 'sector',
           options: [
-            { value: 'sector', text: "Sector" },
-            { value: 'country', text: "Country" },
+            {value: 'sector', text: "Sector"},
+            {value: 'country', text: "Country"},
           ],
         },
 
@@ -82,9 +79,9 @@ export default {
           label: 'Covid metric',
           selected: 'cases',
           options: [
-            { value: 'cases', text: 'Cases' },
-            { value: 'recoveries', text: 'Recoveries' },
-            { value: 'deaths', text: 'Deaths' },
+            {value: 'cases', text: 'Cases'},
+            {value: 'recoveries', text: 'Recoveries'},
+            {value: 'deaths', text: 'Deaths'},
           ],
         },
 
@@ -103,18 +100,12 @@ export default {
      * Load the datasets
      */
     loadData() {
-      // Async loading of emission data
-      fetch("data/emission.json")
-          .then(response => {
-            this.data.emission = response.json();
-            this.emissionLoaded = true;
-          });
-      // Async loading of covid data
-      fetch("data/emission.json") // TODO Switch to covid.json once that's present
-          .then(response => {
-            this.data.covid = response.json();
-            this.covidLoaded = true;
-          });
+      // Async loading of the data
+      fetch("data/data.json")
+        .then(response => {
+          this.data = response.json();
+          this.dataLoaded = true;
+        });
     },
   },
 };

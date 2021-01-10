@@ -8,7 +8,8 @@
 
 <script>
 export default {
-  name: "EmissionExcerpt"
+  name: "EmissionExcerpt",
+  props: ['data', 'settings', 'time'],
 }
 </script>
 
