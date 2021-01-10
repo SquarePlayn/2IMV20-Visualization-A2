@@ -1,0 +1,37 @@
+{
+  "countries": [
+    {
+      "code": "NL",
+      "text": "The Netherlands",
+      "geo_x": 151,
+      "geo_y": 161
+    }
+  ],
+  "sectors": [
+    {
+      "key": "transport",
+      "text": "Transport"
+    },
+    {
+      "key": "agriculture",
+      "text": "Agriculture"
+    }
+  ],
+  "dates": {
+    "2020-10-05": {
+      "date": "2020-10-05",
+      "countries": {
+        "NL": {
+          "corona_cases": 10,
+          "corona_deaths": 12,
+          "corona_recoveries": 13,
+          "total_emission": 122,
+          "emission_sectors": {
+            "transport": 50,
+            "agriculture": 72
+          }
+        }
+      }
+    }
+  }
+}
