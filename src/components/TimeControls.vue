@@ -18,8 +18,8 @@
                 id="time-slider"
                 v-model="time"
                 type="range"
-                min="0"
-                max="364"
+                :min="min"
+                :max="max"
                 @input="pause"
         />
         <b-input-group-append is-text>
@@ -46,6 +46,8 @@ export default {
       time: 0,
       playing: false,
       timer: null,
+      min: 0,
+      max: 364,
     };
   },
 
@@ -78,6 +80,9 @@ export default {
     advanceIfPlaying() {
       if (this.playing) {
         this.next();
+        if (this.time >= this.max) {
+          this.pause();
+        }
       }
     },
 
@@ -85,14 +90,18 @@ export default {
      * Go forward in time 1 step
      */
     next() {
-      this.time++;
+      if (this.time < this.max) {
+        this.time++;
+      }
     },
 
     /**
      * Go backwards in time 1 step
      */
     previous() {
-      this.time--;
+      if (this.time > this.min) {
+        this.time--;
+      }
     },
   },
 }
