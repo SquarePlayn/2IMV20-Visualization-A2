@@ -1,7 +1,8 @@
 <template>
   <b-row cols="8">
     <svg class="w-100 h-100 world-map">
-      <g id="map"/>
+      <g id="svg-world"/>
+      <g id="svg-centers"/>
     </svg>
   </b-row>
 </template>
@@ -17,8 +18,10 @@ export default {
   data() {
     return {
       countries: null,
+      centers: null,
       selected: null,
       outline: {type: "Sphere"},
+      projection: d3.geoMercator().scale(140).translate([1250 / 2, 460 / 1.4])
     };
   },
 
@@ -35,9 +38,9 @@ export default {
       return 460;
     },
 
-    projection() {
-      return d3.geoMercator().scale(140).translate([this.width / 2, this.height / 1.4]);
-    },
+    // projection() {
+    //   return ;
+    // },
   },
 
   mounted() {
@@ -60,13 +63,21 @@ export default {
           // Create the map
           this.createWorld();
         });
+
+      axios.get('data/country-centers.json')
+        .then(response => {
+          //Save the data
+          this.centers = response.data.countries;
+
+          this.createCenters();
+        })
     },
 
     createWorld() {
       const that = this;
-      const g = d3.select('g');
+      const g = d3.select('#svg-world');
       const path = d3.geoPath(this.projection);
-      g.selectAll('path')
+      g.selectAll('.country')
         .data(this.countries)
         .enter()
         .append('path')
@@ -89,6 +100,24 @@ export default {
           d3.select(this).classed("hovered", false);
         })
       ;
+    },
+
+    createCenters() {
+      const that = this;
+      const g = d3.select('#svg-centers');
+      const path = d3.geoPath(this.projection);
+
+      g.selectAll('.country-center')
+        .data(this.centers)
+        .enter()
+        .append('circle')
+        .attr('r', 2)
+        .attr('cx', function(d) {
+          const coords = this.projection([d.long, d.lat]);
+          console.log(coords);
+          return coords[0];
+        })
+        .attr('cy', 100);
     },
 
     updateMap() {
