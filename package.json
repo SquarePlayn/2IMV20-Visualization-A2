@@ -7,9 +7,12 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
+    "axios": "^0.21.1",
     "bootstrap-vue": "^2.21.1",
     "core-js": "^3.6.5",
     "d3": "^6.3.1",
+    "d3-geo": "^2.0.1",
+    "topojson": "^3.0.2",
     "vue": "^2.6.11",
     "vuex": "^3.4.0"
   },

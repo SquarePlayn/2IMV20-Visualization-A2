@@ -4,9 +4,11 @@
       class="main-container h-100 d-flex flex-column"
   >
     <!-- Header -->
+    <!-- (Disabled)
     <b-row>
       <app-header/>
     </b-row>
+    -->
     <!-- Main content -->
     <b-row class="flex-grow-1">
       <b-spinner v-if="!dataLoaded"/>
@@ -101,9 +103,9 @@ export default {
      */
     loadData() {
       // Async loading of the data
-      fetch("data/data.json")
+      axios.get("data/data.json")
         .then(response => {
-          this.data = response.json();
+          this.data = response.data;
           this.dataLoaded = true;
         });
     },
