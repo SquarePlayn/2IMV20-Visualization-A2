@@ -103,21 +103,19 @@ export default {
     },
 
     createCenters() {
-      const that = this;
-      const g = d3.select('#svg-centers');
-      const path = d3.geoPath(this.projection);
-
-      g.selectAll('.country-center')
+      //  https://developers.google.com/public-data/docs/canonical/countries_csv
+      d3.select('#svg-centers')
+        .selectAll('.country-center')
         .data(this.centers)
         .enter()
         .append('circle')
         .attr('r', 2)
-        .attr('cx', function(d) {
-          const coords = this.projection([d.long, d.lat]);
-          console.log(coords);
-          return coords[0];
+        .attr('cx', (d) => {
+          return this.projection([d.long, d.lat])[0];
         })
-        .attr('cy', 100);
+        .attr('cy', (d) => {
+          return this.projection([d.long, d.lat])[1];
+        });
     },
 
     updateMap() {
