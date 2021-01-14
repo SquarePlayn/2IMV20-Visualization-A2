@@ -129,6 +129,7 @@ export default {
 .world-map {
   min-height: 48vh;
   background-color: lightblue;
+  border: 1px solid gray;
 }
 </style>
 

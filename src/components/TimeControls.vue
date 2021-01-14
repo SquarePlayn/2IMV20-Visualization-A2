@@ -16,16 +16,14 @@
         </b-input-group-prepend>
         <b-form-input
                 id="time-slider"
-                v-model="time"
+                v-model.number="time"
                 type="range"
                 :min="min"
                 :max="max"
                 @input="pause"
         />
         <b-input-group-append is-text>
-<!--          <b-input-group-text square>-->
-            {{ time }}
-<!--          </b-input-group-text>-->
+            {{ formatDate(time) }}
         </b-input-group-append>
       </b-input-group>
     </b-row>
@@ -36,8 +34,12 @@
 </template>
 
 <script>
+import { utility } from "../mixins/utility";
+
 export default {
   name: "TimeControls",
+
+  mixins: [utility],
 
   props: ['value'],
 
@@ -46,14 +48,15 @@ export default {
       time: 0,
       playing: false,
       timer: null,
-      min: 0,
-      max: 364,
+      min: 0, // 2020-01-22
+      max: 324, // 2020-12-11
+      speed: 4, // Days per second
     };
   },
 
   mounted() {
     this.time = this.value;
-    this.timer = setInterval(() => this.advanceIfPlaying(), 500);
+    this.timer = setInterval(() => this.advanceIfPlaying(), 1000 / this.speed);
   },
 
   watch: {

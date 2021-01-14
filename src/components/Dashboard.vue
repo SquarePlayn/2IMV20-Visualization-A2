@@ -103,7 +103,7 @@ export default {
      */
     loadData() {
       // Async loading of the data
-      axios.get("data/data.json")
+      axios.get("data/dataset.json")
         .then(response => {
           this.data = response.data;
           this.dataLoaded = true;
