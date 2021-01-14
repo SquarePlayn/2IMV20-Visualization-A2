@@ -19,10 +19,14 @@ export default {
 
   data() {
     return {
+      // Data sets for country lines and centers
       countries: null,
       centers: null,
+
+      // Currently selected country
       selected: null,
-      outline: {type: "Sphere"},
+
+      // Geo coordinates to 2d coordinates projection
       projection: d3.geoMercator().scale(140).translate([1250 / 2, 460 / 1.4])
     };
   },
@@ -33,20 +37,12 @@ export default {
     },
 
     height() {
-      // const [[x0, y0], [x1, y1]] = d3.geoPath(d3.geoMercator().fitWidth(this.width, this.outline)).bounds(this.outline);
-      // const dy = Math.ceil(y1 - y0), l = Math.min(Math.ceil(x1 - x0), dy);
-      // this.projection.scale(this.projection.scale() * (l - 1) / l).precision(0.2);
-      // return dy;
       return 460;
     },
-
-    // projection() {
-    //   return ;
-    // },
   },
 
   mounted() {
-    this.loadCountries();
+    this.loadCountryDatasets();
   },
 
   watch: {
@@ -55,7 +51,7 @@ export default {
   },
 
   methods: {
-    loadCountries() {
+    loadCountryDatasets() {
       // Async loading of the countries data
       axios.get('data/countries-110m.json')
         .then(response => {
