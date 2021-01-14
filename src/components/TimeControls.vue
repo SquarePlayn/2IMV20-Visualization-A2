@@ -1,6 +1,5 @@
 <template>
-  <b-col cols="8" class="time-controls justify-content-center">
-    <b-row>
+  <b-row class="time-controls justify-content-center">
       <b-input-group>
         <b-input-group-prepend>
           <b-button @click="previous">
@@ -26,11 +25,7 @@
             {{ formatDate(time) }}
         </b-input-group-append>
       </b-input-group>
-    </b-row>
-    <b-row>
-
-    </b-row>
-  </b-col>
+  </b-row>
 </template>
 
 <script>

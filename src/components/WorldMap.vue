@@ -1,5 +1,5 @@
 <template>
-  <b-row cols="8">
+  <b-row>
     <svg class="w-100 h-100 world-map">
       <g id="svg-world"/>
       <g id="svg-centers"/>

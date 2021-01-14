@@ -1,6 +1,6 @@
 <template>
   <b-row>
-    <b-col cols="6" class="emission-excerpt">
+    <b-col class="emission-excerpt">
       Emission chart excerpt at current time will go here.
     </b-col>
   </b-row>
@@ -16,6 +16,6 @@ export default {
 <style scoped>
 .emission-excerpt {
   background-color: deepskyblue;
-  height: 45vh;
+  height: 48vh;
 }
 </style>

@@ -10,31 +10,28 @@
     </b-row>
     -->
     <!-- Main content -->
-    <b-row class="flex-grow-1">
-      <b-spinner v-if="!dataLoaded"/>
-      <b-col v-else>
-        <b-row>
-          <!-- Selectors -->
-          <b-col cols="2" align-h="right">
-            <selectors :settings="settings"/>
-          </b-col>
-          <!-- World Map -->
-          <b-col cols="8" align-h="center">
-            <world-map :data="data" :settings="settings" :time="time"/>
-          </b-col>
-          <!-- Emission Excerpt -->
-          <b-col cols="2" align-h="left">
-            <emission-excerpt :data="data" :settings="settings" :time="time"/>
-          </b-col>
-        </b-row>
+    <b-spinner v-if="!dataLoaded"/>
+    <b-row v-else class="flex-grow-1">
+
+      <!-- Selectors -->
+      <b-col cols="2" align-h="right">
+        <selectors :settings="settings"/>
+      </b-col>
+
+      <b-col cols="8">
+        <!-- World Map -->
+        <world-map :data="data" :settings="settings" :time="time"/>
+
         <!-- Time Controls -->
-        <b-row align-h="center">
-          <time-controls v-model="time"/>
-        </b-row>
+        <time-controls v-model="time"/>
+
         <!-- Emission Graph -->
-        <b-row align-h="center">
-          <emission :data="data" :settings="settings" :time="time"/>
-        </b-row>
+        <emission :data="data" :settings="settings" :time="time"/>
+      </b-col>
+
+      <!-- Emission Excerpt -->
+      <b-col cols="2" align-h="left">
+        <emission-excerpt :data="data" :settings="settings" :time="time"/>
       </b-col>
     </b-row>
     <!-- Footer -->
