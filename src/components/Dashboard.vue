@@ -76,11 +76,12 @@ export default {
         // Select covid numbers: [cases, recoveries, deaths]
         covidCount: {
           label: 'Covid metric',
-          selected: 'cases',
+          selected: 'Confirmed',
           options: [
-            {value: 'cases', text: 'Cases'},
-            {value: 'recoveries', text: 'Recoveries'},
-            {value: 'deaths', text: 'Deaths'},
+            // Values correspond to keys in dataset
+            {value: 'Confirmed', text: 'Cases'},
+            {value: 'Recovered', text: 'Recoveries'},
+            {value: 'Deaths', text: 'Deaths'},
           ],
         },
 
