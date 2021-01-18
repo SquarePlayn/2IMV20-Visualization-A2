@@ -1,24 +1,19 @@
 <template>
-  <b-row class="selectors">
-    <b-col>
-      <b-row
-        v-for="(setting, key) in settings"
-        :key="key"
-      >
-        <b-col align="right">
-          <label :for="`selector-${key}`">
-            {{  setting.label }}:
-          </label>
-        </b-col>
-        <b-col align="left" class="p-0">
-          <b-form-select
-            :id="`selector-${key}`"
-            v-model="setting.selected"
-            :options="setting.options"
-          />
-        </b-col>
-      </b-row>
-    </b-col>
+  <b-row class="selectors justify-content-center">
+    <!-- Form group for every setting -->
+    <b-form-group
+      class="setting"
+      v-for="(setting, key) in settings"
+      :id="`selector-${key}`"
+      :label="setting.label"
+    >
+      <!-- Use button style radio input -->
+      <b-form-radio-group
+        v-model="setting.selected"
+        :options="setting.options"
+        buttons
+      />
+    </b-form-group>
   </b-row>
 </template>
 
@@ -31,6 +26,11 @@ export default {
 
 <style scoped>
 .selectors {
-  background-color: deepskyblue;
+  padding-top: 2em;
+}
+
+.setting {
+  /* Spacing between settings */
+  padding-bottom: 1em;
 }
 </style>

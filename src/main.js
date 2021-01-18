@@ -12,6 +12,8 @@ import store from './store';
 
 Vue.config.productionTip = false;
 
+window.axios = require('axios').default;
+
 Vue.use(BootstrapVue);
 Vue.use(IconsPlugin);
 

@@ -1,6 +1,5 @@
 <template>
-  <b-col cols="8" class="time-controls justify-content-center">
-    <b-row>
+  <b-row class="time-controls justify-content-center">
       <b-input-group>
         <b-input-group-prepend>
           <b-button @click="previous">
@@ -16,28 +15,26 @@
         </b-input-group-prepend>
         <b-form-input
                 id="time-slider"
-                v-model="time"
+                v-model.number="time"
                 type="range"
-                min="0"
-                max="364"
+                :min="min"
+                :max="max"
                 @input="pause"
         />
         <b-input-group-append is-text>
-<!--          <b-input-group-text square>-->
-            {{ time }}
-<!--          </b-input-group-text>-->
+            {{ formatDate(time) }}
         </b-input-group-append>
       </b-input-group>
-    </b-row>
-    <b-row>
-
-    </b-row>
-  </b-col>
+  </b-row>
 </template>
 
 <script>
+import { utility } from "../mixins/utility";
+
 export default {
   name: "TimeControls",
+
+  mixins: [utility],
 
   props: ['value'],
 
@@ -46,12 +43,15 @@ export default {
       time: 0,
       playing: false,
       timer: null,
+      min: 0, // 2020-01-22
+      max: 324, // 2020-12-11
+      speed: 4, // Days per second
     };
   },
 
   mounted() {
     this.time = this.value;
-    this.timer = setInterval(() => this.advanceIfPlaying(), 500);
+    this.timer = setInterval(() => this.advanceIfPlaying(), 1000 / this.speed);
   },
 
   watch: {
@@ -78,6 +78,9 @@ export default {
     advanceIfPlaying() {
       if (this.playing) {
         this.next();
+        if (this.time >= this.max) {
+          this.pause();
+        }
       }
     },
 
@@ -85,14 +88,18 @@ export default {
      * Go forward in time 1 step
      */
     next() {
-      this.time++;
+      if (this.time < this.max) {
+        this.time++;
+      }
     },
 
     /**
      * Go backwards in time 1 step
      */
     previous() {
-      this.time--;
+      if (this.time > this.min) {
+        this.time--;
+      }
     },
   },
 }

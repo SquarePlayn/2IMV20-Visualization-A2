@@ -1,7 +1,7 @@
 <template>
-  <b-col cols="8" class="emission-chart">
+  <b-row class="emission-chart">
     Emission chart will go here.
-  </b-col>
+  </b-row>
 </template>
 
 <script>
