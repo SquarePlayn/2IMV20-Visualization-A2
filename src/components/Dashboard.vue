@@ -87,6 +87,10 @@ export default {
 
         // Select country (to display emission chart)
         // TODO
+        country: {
+          label: 'Country',
+          selected: 'country'
+        }
       },
     };
   },
@@ -102,10 +106,10 @@ export default {
     loadData() {
       // Async loading of the data
       axios.get("data/dataset.json")
-        .then(response => {
-          this.data = response.data;
-          this.dataLoaded = true;
-        });
+          .then(response => {
+            this.data = response.data;
+            this.dataLoaded = true;
+          });
     },
   },
 };

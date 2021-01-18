@@ -1,6 +1,7 @@
 // Import Vue and other plugins
 import Vue from 'vue';
 import {BootstrapVue, IconsPlugin} from "bootstrap-vue";
+import HighchartsVue from 'highcharts-vue';
 
 // Import CSS
 import 'bootstrap/dist/css/bootstrap.css';
@@ -16,6 +17,7 @@ window.axios = require('axios').default;
 
 Vue.use(BootstrapVue);
 Vue.use(IconsPlugin);
+Vue.use(HighchartsVue);
 
 new Vue({
     store,

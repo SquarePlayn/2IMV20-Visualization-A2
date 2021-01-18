@@ -1,6 +1,6 @@
 <template>
   <b-row>
-    <svg class="w-100 h-100 world-map">
+    <svg className="w-100 h-100 world-map">
       <g id="svg-world"/>
       <g id="svg-centers"/>
     </svg>
@@ -10,7 +10,7 @@
 <script>
 import * as d3 from 'd3/dist/d3';
 import * as topojson from 'topojson/dist/topojson';
-import { utility } from "../mixins/utility";
+import {utility} from "../mixins/utility";
 
 export default {
   name: "WorldMap",
@@ -22,6 +22,8 @@ export default {
       // Data sets for country lines and centers
       countries: null,
       centers: null,
+
+      selectedCountryName: null,
 
       // Currently selected country
       selected: null,
@@ -54,22 +56,22 @@ export default {
     loadCountryDatasets() {
       // Async loading of the countries data
       axios.get('data/countries-110m.json')
-        .then(response => {
-          // Save the data
-          const data = response.data;
-          this.countries = topojson.feature(data, data.objects.countries).features;
+          .then(response => {
+            // Save the data
+            const data = response.data;
+            this.countries = topojson.feature(data, data.objects.countries).features;
 
-          // Create the map
-          this.createWorld();
-        });
+            // Create the map
+            this.createWorld();
+          });
 
       axios.get('data/country-centers.json')
-        .then(response => {
-          //Save the data
-          this.centers = response.data.countries;
+          .then(response => {
+            //Save the data
+            this.centers = response.data.countries;
 
-          this.createCenters();
-        })
+            this.createCenters();
+          })
     },
 
     createWorld() {
@@ -77,27 +79,29 @@ export default {
       const g = d3.select('#svg-world');
       const path = d3.geoPath(this.projection);
       g.selectAll('.country')
-        .data(this.countries)
-        .enter()
-        .append('path')
-        .attr('class', 'country')
-        .attr('d', path)
-        .on('click', function(d) {
-          // On clicking a country, give it the selected class and store it in the selected variable
-          d3.select(this).classed('selected', true);
-          if (that.selected) {
-            d3.select(that.selected).classed('selected', false);
-          }
-          that.selected = this;
-        })
-        .on('mouseover', function(d) {
-          // Detect hovering over
-          d3.select(this).classed("hovered", true);
-        })
-        .on('mouseout', function(d) {
-          // Reset hovered when moving mouse away
-          d3.select(this).classed("hovered", false);
-        })
+          .data(this.countries)
+          .enter()
+          .append('path')
+          .attr('class', 'country')
+          .attr('d', path)
+          .on('click', function (d) {
+            // On clicking a country, give it the selected class and store it in the selected variable
+            d3.select(this).classed('selected', true);
+            that.settings.country.selected = d.target.__data__.properties.name;
+            // console.log(this.selectedCountryName);
+            if (that.selected) {
+              d3.select(that.selected).classed('selected', false);
+            }
+            that.selected = this;
+          })
+          .on('mouseover', function (d) {
+            // Detect hovering over
+            d3.select(this).classed("hovered", true);
+          })
+          .on('mouseout', function (d) {
+            // Reset hovered when moving mouse away
+            d3.select(this).classed("hovered", false);
+          })
       ;
     },
 
@@ -106,19 +110,19 @@ export default {
 
       // Create the circles
       d3.select('#svg-centers')
-        .selectAll('.country-center')
-        .data(this.centers)
-        .enter()
-        .append('circle')
-        .attr('class', 'country-center')
-        .attr('r', 0) // Filled at update
-        .attr('fill', '#fff') // Filled at update
-        .attr('cx', (d) => {
-          return this.projection([d.long, d.lat])[0];
-        })
-        .attr('cy', (d) => {
-          return this.projection([d.long, d.lat])[1];
-        });
+          .selectAll('.country-center')
+          .data(this.centers)
+          .enter()
+          .append('circle')
+          .attr('class', 'country-center')
+          .attr('r', 0) // Filled at update
+          .attr('fill', '#fff') // Filled at update
+          .attr('cx', (d) => {
+            return this.projection([d.long, d.lat])[0];
+          })
+          .attr('cy', (d) => {
+            return this.projection([d.long, d.lat])[1];
+          });
 
       // Set them to the right properties for the current time
       this.updateMap();
@@ -145,32 +149,32 @@ export default {
 
       // Update the country circles
       d3.select('#svg-centers')
-        .selectAll('circle')
-        .transition()
-        .duration(1)
-        .attr('r', (d) => {
-          // Size based on selected covid count
-          const countryData =  dateData[d.name];
-          const covidCount = countryData[this.settings.covidCount.selected];
-          return Math.sqrt(covidCount) / 100.0;
-        })
-        .attr('fill', (d) => {
-          // Color based on change
-          const countryDataToday = dateData[d.name];
-          const countryDataYesterday = yesterdayData[d.name];
-          const covidCountToday = countryDataToday[this.settings.covidCount.selected];
-          const covidCountYesterday = countryDataYesterday[this.settings.covidCount.selected];
+          .selectAll('circle')
+          .transition()
+          .duration(1)
+          .attr('r', (d) => {
+            // Size based on selected covid count
+            const countryData = dateData[d.name];
+            const covidCount = countryData[this.settings.covidCount.selected];
+            return Math.sqrt(covidCount) / 100.0;
+          })
+          .attr('fill', (d) => {
+            // Color based on change
+            const countryDataToday = dateData[d.name];
+            const countryDataYesterday = yesterdayData[d.name];
+            const covidCountToday = countryDataToday[this.settings.covidCount.selected];
+            const covidCountYesterday = countryDataYesterday[this.settings.covidCount.selected];
 
-          const change = (covidCountToday - covidCountYesterday) / covidCountYesterday;
+            const change = (covidCountToday - covidCountYesterday) / covidCountYesterday;
 
-          const lower = -0.05;
-          const upper = 0.05;
+            const lower = -0.05;
+            const upper = 0.05;
 
-          const r = change < 0 ? 0 : 255 * (change / upper);
-          const g = change > 0 ? 0 : 255 * (change / lower);
-          const b = 0;
-          return `rgb(${r}, ${g}, ${b})`;
-        });
+            const r = change < 0 ? 0 : 255 * (change / upper);
+            const g = change > 0 ? 0 : 255 * (change / lower);
+            const b = 0;
+            return `rgb(${r}, ${g}, ${b})`;
+          });
     },
   }
 }
