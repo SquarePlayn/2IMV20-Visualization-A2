@@ -1,6 +1,6 @@
 <template>
   <b-row>
-    <svg className="w-100 h-100 world-map">
+    <svg class="w-100 h-100 world-map">
       <g id="svg-world"/>
       <g id="svg-centers"/>
     </svg>
