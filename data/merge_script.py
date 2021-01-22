@@ -240,7 +240,7 @@ def dump_json_to_disk(total_df: pd.DataFrame):
     dict_format = total_df.to_dict()
 
     # json_result = json.dumps(dict_format)
-    with open("dataset.json", "w") as f:
+    with open("../public/data/dataset.json", "w") as f:
         json.dump(dict_format, f)
 
 
