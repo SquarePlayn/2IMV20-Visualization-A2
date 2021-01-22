@@ -1,8 +1,10 @@
+import datetime
 import pandas as pd
 import json
 from copy import deepcopy
 
 DATE_COLUMN = 'Date'
+DATE_FANCY_COLUMN = 'Date Fancy'
 COUNTRY_COLUMN = 'Country'
 CONFIRMED_COLUMN = 'Confirmed'
 DEATHS_COLUMN = 'Deaths'
@@ -10,15 +12,22 @@ RECOVERED_COLUMN = 'Recovered'
 POWER_COLUMN = 'Emissions'
 LAT_COLUMN = 'Lat'
 LONG_COLUMN = 'Long'
-
 ROLLING_SUFFIX = " Rolling"
 
-MOVING_WINDOW_SIZE = 14
+HAS_CARBON = "Has Carbon"
+HAS_COVID = "Has Covid"
+HAS_BOTH = "Has Both"
 
+POWER_CATEGORIES = ["Power", "Ground Transport", "Industry", "Residential", "Domestic Aviation"]
 COUNTRIES = ["Brazil", "China", "France", "Germany", "India", "Italy", "Japan", "Russia", "Spain", "United Kingdom",
              "United States"]
 
-POWER_CATEGORIES = ["Power", "Ground Transport", "Industry", "Residential", "Domestic Aviation"]
+MOVING_WINDOW_SIZE = 14
+
+# Filters include the last and first date!
+# Dataset values: Covid ranges from 22 Jan 2020 until 4 Jan 2021, Carbon ranges from 01 Jan 2019 until 30 Nov 2020
+COVID_DATE_RANGE = (datetime.datetime(day=22, month=1, year=2020), datetime.datetime(day=30, month=11, year=2020))
+CARBON_DATE_RANGE = (datetime.datetime(day=22, month=1, year=2020), datetime.datetime(day=30, month=11, year=2020))
 
 
 def create_covid_df() -> pd.DataFrame:
@@ -70,12 +79,14 @@ def preprocess_covid_df(covid_dataframes):
         formatted_df = pd.DataFrame(row_formatted_dicts)
 
         formatted_df[DATE_COLUMN] = pd.to_datetime(formatted_df[DATE_COLUMN], format='%m/%d/%y')
+        formatted_df = formatted_df[
+            (formatted_df[DATE_COLUMN] >= COVID_DATE_RANGE[0]) & (formatted_df[DATE_COLUMN] <= COVID_DATE_RANGE[1])]
 
         formatted_df.sort_values(by=[COUNTRY_COLUMN, DATE_COLUMN], inplace=True)
         formatted_df.reset_index(inplace=True, drop=True)
 
-        formatted_df[col+ROLLING_SUFFIX] = \
-            formatted_df.groupby(COUNTRY_COLUMN, sort=False)[col].\
+        formatted_df[col + ROLLING_SUFFIX] = \
+            formatted_df.groupby(COUNTRY_COLUMN, sort=False)[col]. \
                 rolling(MOVING_WINDOW_SIZE, min_periods=1).mean().reset_index(drop=True)
 
         covid_dfs[col] = formatted_df
@@ -112,22 +123,32 @@ def create_carbon_df() -> pd.DataFrame:
     carbon_df = pd.DataFrame(carbon_df.apply(df_to_dict_func, axis=1).to_list())
 
     carbon_df[DATE_COLUMN] = pd.to_datetime(carbon_df[DATE_COLUMN], format="%d/%m/%Y")
+    carbon_df = carbon_df[
+        (carbon_df[DATE_COLUMN] >= CARBON_DATE_RANGE[0]) & (carbon_df[DATE_COLUMN] <= CARBON_DATE_RANGE[1])]
 
     carbon_df.sort_values(by=[COUNTRY_COLUMN, DATE_COLUMN], inplace=True)
     carbon_df.reset_index(inplace=True, drop=True)
 
-    rolling_values = carbon_df.groupby(COUNTRY_COLUMN, sort=False)[POWER_CATEGORIES].\
+    rolling_values = carbon_df.groupby(COUNTRY_COLUMN, sort=False)[POWER_CATEGORIES]. \
         rolling(MOVING_WINDOW_SIZE, min_periods=1).mean().reset_index(drop=True)
-
-    # rolling_values.rename(columns={col: col + ROLLING_SUFFIX for col in rolling_values.columns}, inplace=True)
 
     carbon_df[[col + ROLLING_SUFFIX for col in rolling_values.columns]] = rolling_values
 
-    # carbon_df = pd.merge(carbon_df, rolling_values, on=[COUNTRY_COLUMN, DATE_COLUMN], how='inner')
-
-
-
     return carbon_df
+
+
+def preprocess_main_dataframe(total_df: pd.DataFrame) -> pd.DataFrame:
+    total_df.sort_values(by=[COUNTRY_COLUMN, DATE_COLUMN], inplace=True)
+
+    total_df[DATE_FANCY_COLUMN] = total_df[DATE_COLUMN].apply(lambda x: x.strftime('%d %b %Y'))
+    total_df[DATE_COLUMN] = total_df[DATE_COLUMN].apply(lambda x: x.strftime('%Y-%m-%d'))
+
+    total_df[HAS_CARBON] = (total_df["_merge"] == "right_only") | (total_df["_merge"] == "both")
+    total_df[HAS_COVID] = (total_df["_merge"] == "left_only") | (total_df["_merge"] == "both")
+    total_df[HAS_BOTH] = (total_df["_merge"] == "both")
+    total_df.drop(columns=["_merge"], inplace=True)
+
+    return total_df
 
 
 def create_main_dataframe() -> pd.DataFrame:
@@ -135,24 +156,24 @@ def create_main_dataframe() -> pd.DataFrame:
     carbon_df = create_carbon_df()
     covid_df = create_covid_df()
 
+    total_df = pd.merge(covid_df, carbon_df, how='outer', indicator=True, on=[DATE_COLUMN, COUNTRY_COLUMN])
 
-    total_df = pd.merge(covid_df, carbon_df, how='outer', on=[DATE_COLUMN, COUNTRY_COLUMN])
+    total_df = preprocess_main_dataframe(total_df)
 
-    total_df[DATE_COLUMN] = total_df[DATE_COLUMN].apply(lambda x: x.strftime('%Y-%m-%d'))
     return total_df
 
 
 def dump_json_to_disk(total_df: pd.DataFrame):
     """Dumps the total result to the disk in json format"""
 
-    def row_to_dict(row):
-        return {col: row[col] for col in [CONFIRMED_COLUMN, DEATHS_COLUMN, RECOVERED_COLUMN, POWER_COLUMN]}
+    # def row_to_dict(row):
+    #     return {col: row[col] for col in [CONFIRMED_COLUMN, DEATHS_COLUMN, RECOVERED_COLUMN, POWER_COLUMN]}
+    #
+    # def merge(x):
+    #     return {row[COUNTRY_COLUMN]: row_to_dict(row) for idx, row in x.iterrows()}
 
-    def merge(x):
-        return {row[COUNTRY_COLUMN]: row_to_dict(row) for idx, row in x.iterrows()}
-
-    dict_format = total_df.groupby(DATE_COLUMN, as_index=True).apply(merge)
-    dict_format = dict_format.to_dict()
+    # dict_format = total_df.groupby(DATE_COLUMN, as_index=True).apply(merge)
+    dict_format = total_df.to_dict()
 
     # json_result = json.dumps(dict_format)
     with open("dataset.json", "w") as f:
