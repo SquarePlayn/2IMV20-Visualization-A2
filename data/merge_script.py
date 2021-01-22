@@ -10,6 +10,7 @@ CONFIRMED_COLUMN = 'Confirmed'
 DEATHS_COLUMN = 'Deaths'
 RECOVERED_COLUMN = 'Recovered'
 POWER_COLUMN = 'Emissions'
+TOTAL_EMISSIONS_COLUMN = 'Total Emissions'
 LAT_COLUMN = 'Lat'
 LONG_COLUMN = 'Long'
 ROLLING_SUFFIX = " Rolling"
@@ -18,7 +19,7 @@ HAS_CARBON = "Has Carbon"
 HAS_COVID = "Has Covid"
 HAS_BOTH = "Has Both"
 
-POWER_CATEGORIES = ["Power", "Ground Transport", "Industry", "Residential", "Domestic Aviation"]
+POWER_CATEGORIES = [TOTAL_EMISSIONS_COLUMN, "Power", "Ground Transport", "Industry", "Residential", "Domestic Aviation"]
 COUNTRIES = ["Brazil", "China", "France", "Germany", "India", "Italy", "Japan", "Russia", "Spain", "United Kingdom",
              "United States"]
 
@@ -118,7 +119,8 @@ def create_carbon_df() -> pd.DataFrame:
         {POWER_COLUMN: merge_dicts}
     )
 
-    df_to_dict_func = lambda x: {DATE_COLUMN: x[DATE_COLUMN], COUNTRY_COLUMN: x[COUNTRY_COLUMN], **x[POWER_COLUMN]}
+    df_to_dict_func = lambda x: {DATE_COLUMN: x[DATE_COLUMN], COUNTRY_COLUMN: x[COUNTRY_COLUMN],
+                                 TOTAL_EMISSIONS_COLUMN: sum(x[POWER_COLUMN].values()), **x[POWER_COLUMN]}
 
     carbon_df = pd.DataFrame(carbon_df.apply(df_to_dict_func, axis=1).to_list())
 
@@ -182,5 +184,7 @@ def dump_json_to_disk(total_df: pd.DataFrame):
 
 if __name__ == "__main__":
     total_df = create_main_dataframe()
+
+    total_df.to_csv("dataset.csv")
 
     dump_json_to_disk(total_df)
