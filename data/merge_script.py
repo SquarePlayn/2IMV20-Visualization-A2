@@ -10,10 +10,13 @@ CONFIRMED_COLUMN = 'Confirmed'
 DEATHS_COLUMN = 'Deaths'
 RECOVERED_COLUMN = 'Recovered'
 POWER_COLUMN = 'Emissions'
+POPULATION_COLUMN = "Population"
 TOTAL_EMISSIONS_COLUMN = 'Total Emissions'
 LAT_COLUMN = 'Lat'
 LONG_COLUMN = 'Long'
+
 ROLLING_SUFFIX = " Rolling"
+PER_CAPITA_SUFFIX = " Per Capita"
 
 HAS_CARBON = "Has Carbon"
 HAS_COVID = "Has Covid"
@@ -41,6 +44,8 @@ def create_covid_df() -> pd.DataFrame:
     covid_recovered_df = pd.read_csv("time_series_covid19_recovered_global.csv"). \
         rename(columns={"Country/Region": COUNTRY_COLUMN})
 
+    # TODO: Rolling avg should be based on change
+
     def map_covid_names_and_filter(data):
         data.drop(columns=["Province/State", "Lat", "Long"], inplace=True)
         data.loc[data[COUNTRY_COLUMN] == "US", COUNTRY_COLUMN] = "United States"
@@ -64,9 +69,44 @@ def create_covid_df() -> pd.DataFrame:
 
     covid_df = pd.merge(covid_df, lat_long, on=[COUNTRY_COLUMN], how='left')
 
-    # TODO: Fix date range
+    covid_df = covid_df[~covid_df[COUNTRY_COLUMN].isin(['Diamond Princess', 'Holy See', 'MS Zaandam'])]
 
     return covid_df
+
+
+def create_population_df() -> pd.DataFrame():
+    """Returns a dataframe containing population counts."""
+
+    data = pd.read_csv("population_counts.csv")
+
+    mapping = \
+        {
+            "Bahamas, The": 'Bahamas',
+            'Brunei Darussalam': 'Brunei',
+            'Myanmar': 'Burma',
+            'Congo, Dem. Rep.': 'Congo (Brazzaville)',
+            'Congo, Rep.': 'Congo (Kinshasa)',
+            'Czech Republic': 'Czechia',
+            'Egypt, Arab Rep.': 'Egypt',
+            'Gambia, The': 'Gambia',
+            'Iran, Islamic Rep.': 'Iran',
+            'Korea, Rep.': 'Korea, South',
+            'Kyrgyz Republic': 'Kyrgyzstan',
+            'Lao PDR': 'Laos',
+            'Russian Federation': 'Russia',
+            'St. Kitts and Nevis': 'Saint Kitts and Nevis',
+            'St. Lucia': 'Saint Lucia',
+            'St. Vincent and the Grenadines': 'Saint Vincent and the Grenadines',
+            'Slovak Republic': 'Slovakia',
+            'Syrian Arab Republic': 'Syria',
+            'Venezuela, RB': 'Venezuela',
+            'Yemen, Rep.': 'Yemen'
+        }
+
+    data.replace(mapping, inplace=True)
+
+    data = data.append([{COUNTRY_COLUMN: "Taiwan*", POPULATION_COLUMN: 23_780_000}])
+    return data
 
 
 def preprocess_covid_df(covid_dataframes):
@@ -150,6 +190,13 @@ def preprocess_main_dataframe(total_df: pd.DataFrame) -> pd.DataFrame:
     total_df[HAS_BOTH] = (total_df["_merge"] == "both")
     total_df.drop(columns=["_merge"], inplace=True)
 
+    base_categories = [CONFIRMED_COLUMN, DEATHS_COLUMN, RECOVERED_COLUMN, TOTAL_EMISSIONS_COLUMN] + POWER_CATEGORIES
+    all_categories = base_categories + [col + ROLLING_SUFFIX for col in base_categories]
+
+    per_capita_values = total_df[all_categories].div(total_df[POPULATION_COLUMN], axis=0)
+    per_capita_values.rename(columns={col: col + PER_CAPITA_SUFFIX for col in all_categories}, inplace=True)
+    total_df = pd.concat([total_df, per_capita_values], axis=0)
+
     return total_df
 
 
@@ -157,8 +204,10 @@ def create_main_dataframe() -> pd.DataFrame:
     """Returns the combined DataFrame containing COVID data and Carbon Monitor data."""
     carbon_df = create_carbon_df()
     covid_df = create_covid_df()
+    population_df = create_population_df()
 
-    total_df = pd.merge(covid_df, carbon_df, how='outer', indicator=True, on=[DATE_COLUMN, COUNTRY_COLUMN])
+    total_df = pd.merge(covid_df, population_df, how='left', on=[COUNTRY_COLUMN])
+    total_df = pd.merge(total_df, carbon_df, how='outer', indicator=True, on=[DATE_COLUMN, COUNTRY_COLUMN])
 
     total_df = preprocess_main_dataframe(total_df)
 
