@@ -15,6 +15,7 @@ TOTAL_EMISSIONS_COLUMN = 'Total Emissions'
 LAT_COLUMN = 'Lat'
 LONG_COLUMN = 'Long'
 
+CUMULATIVE_SUFFIX = " Cumulative"
 ROLLING_SUFFIX = " Rolling"
 PER_CAPITA_SUFFIX = " Per Capita"
 
@@ -126,6 +127,10 @@ def preprocess_covid_df(covid_dataframes):
         formatted_df.sort_values(by=[COUNTRY_COLUMN, DATE_COLUMN], inplace=True)
         formatted_df.reset_index(inplace=True, drop=True)
 
+        col_cum = col + CUMULATIVE_SUFFIX
+        formatted_df.rename(columns={col: col_cum}, inplace=True)
+        formatted_df[col] = formatted_df.groupby(COUNTRY_COLUMN)[col_cum].diff().fillna(0)
+
         formatted_df[col + ROLLING_SUFFIX] = \
             formatted_df.groupby(COUNTRY_COLUMN, sort=False)[col]. \
                 rolling(MOVING_WINDOW_SIZE, min_periods=1).mean().reset_index(drop=True)
@@ -190,12 +195,20 @@ def preprocess_main_dataframe(total_df: pd.DataFrame) -> pd.DataFrame:
     total_df[HAS_BOTH] = (total_df["_merge"] == "both")
     total_df.drop(columns=["_merge"], inplace=True)
 
-    base_categories = [CONFIRMED_COLUMN, DEATHS_COLUMN, RECOVERED_COLUMN, TOTAL_EMISSIONS_COLUMN] + POWER_CATEGORIES
-    all_categories = base_categories + [col + ROLLING_SUFFIX for col in base_categories]
+    covid_categories = [CONFIRMED_COLUMN, DEATHS_COLUMN, RECOVERED_COLUMN]
+    base_categories = covid_categories + POWER_CATEGORIES
+    all_categories = base_categories + \
+                     [col + ROLLING_SUFFIX for col in base_categories] + \
+                     [col + CUMULATIVE_SUFFIX for col in covid_categories]
 
     per_capita_values = total_df[all_categories].div(total_df[POPULATION_COLUMN], axis=0)
     per_capita_values.rename(columns={col: col + PER_CAPITA_SUFFIX for col in all_categories}, inplace=True)
     total_df = pd.concat([total_df, per_capita_values], axis=0)
+
+    total_df = total_df[
+        [DATE_FANCY_COLUMN, POPULATION_COLUMN, HAS_BOTH, HAS_COVID, HAS_CARBON, LAT_COLUMN, LONG_COLUMN, DATE_COLUMN, COUNTRY_COLUMN,
+         *all_categories, *[col + PER_CAPITA_SUFFIX for col in all_categories]]
+    ]
 
     return total_df
 
