@@ -106,7 +106,8 @@ def create_population_df() -> pd.DataFrame():
 
     data.replace(mapping, inplace=True)
 
-    data = data.append([{COUNTRY_COLUMN: "Taiwan*", POPULATION_COLUMN: 23_780_000}])
+    data = data.append([{COUNTRY_COLUMN: "Taiwan*", POPULATION_COLUMN: 23_780_000},
+                        {COUNTRY_COLUMN: "World", POPULATION_COLUMN: 7_794_798_739}])
     return data
 
 
@@ -203,10 +204,11 @@ def preprocess_main_dataframe(total_df: pd.DataFrame) -> pd.DataFrame:
 
     per_capita_values = total_df[all_categories].div(total_df[POPULATION_COLUMN], axis=0)
     per_capita_values.rename(columns={col: col + PER_CAPITA_SUFFIX for col in all_categories}, inplace=True)
-    total_df = pd.concat([total_df, per_capita_values], axis=0)
+    total_df = pd.concat([total_df.reset_index(drop=True), per_capita_values.reset_index(drop=True)], axis=1)
 
     total_df = total_df[
-        [DATE_FANCY_COLUMN, POPULATION_COLUMN, HAS_BOTH, HAS_COVID, HAS_CARBON, LAT_COLUMN, LONG_COLUMN, DATE_COLUMN, COUNTRY_COLUMN,
+        [DATE_FANCY_COLUMN, POPULATION_COLUMN, HAS_BOTH, HAS_COVID, HAS_CARBON, LAT_COLUMN, LONG_COLUMN, DATE_COLUMN,
+         COUNTRY_COLUMN,
          *all_categories, *[col + PER_CAPITA_SUFFIX for col in all_categories]]
     ]
 
@@ -219,8 +221,8 @@ def create_main_dataframe() -> pd.DataFrame:
     covid_df = create_covid_df()
     population_df = create_population_df()
 
-    total_df = pd.merge(covid_df, population_df, how='left', on=[COUNTRY_COLUMN])
-    total_df = pd.merge(total_df, carbon_df, how='outer', indicator=True, on=[DATE_COLUMN, COUNTRY_COLUMN])
+    total_df = pd.merge(carbon_df, covid_df, how='outer', indicator=True, on=[DATE_COLUMN, COUNTRY_COLUMN])
+    total_df = pd.merge(total_df, population_df, how='left', on=[COUNTRY_COLUMN])
 
     total_df = preprocess_main_dataframe(total_df)
 
