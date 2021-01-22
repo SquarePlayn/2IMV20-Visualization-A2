@@ -11,12 +11,14 @@ POWER_COLUMN = 'Emissions'
 LAT_COLUMN = 'Lat'
 LONG_COLUMN = 'Long'
 
-ROLLING_SUFFIX = "Rolling"
+ROLLING_SUFFIX = " Rolling"
 
 MOVING_WINDOW_SIZE = 14
 
 COUNTRIES = ["Brazil", "China", "France", "Germany", "India", "Italy", "Japan", "Russia", "Spain", "United Kingdom",
              "United States"]
+
+POWER_CATEGORIES = ["Power", "Ground Transport", "Industry", "Residential", "Domestic Aviation"]
 
 
 def create_covid_df() -> pd.DataFrame:
@@ -67,7 +69,7 @@ def preprocess_covid_df(covid_dataframes):
                                for country in all_covid_countries for date in date_columns]
         formatted_df = pd.DataFrame(row_formatted_dicts)
 
-        formatted_df[DATE_COLUMN] = pd.to_datetime(formatted_df[DATE_COLUMN])
+        formatted_df[DATE_COLUMN] = pd.to_datetime(formatted_df[DATE_COLUMN], format='%m/%d/%y')
 
         formatted_df.sort_values(by=[COUNTRY_COLUMN, DATE_COLUMN], inplace=True)
         formatted_df.reset_index(inplace=True, drop=True)
@@ -105,7 +107,26 @@ def create_carbon_df() -> pd.DataFrame:
         {POWER_COLUMN: merge_dicts}
     )
 
-    carbon_df[DATE_COLUMN] = pd.to_datetime(carbon_df[DATE_COLUMN])
+    df_to_dict_func = lambda x: {DATE_COLUMN: x[DATE_COLUMN], COUNTRY_COLUMN: x[COUNTRY_COLUMN], **x[POWER_COLUMN]}
+
+    carbon_df = pd.DataFrame(carbon_df.apply(df_to_dict_func, axis=1).to_list())
+
+    carbon_df[DATE_COLUMN] = pd.to_datetime(carbon_df[DATE_COLUMN], format="%d/%m/%Y")
+
+    carbon_df.sort_values(by=[COUNTRY_COLUMN, DATE_COLUMN], inplace=True)
+    carbon_df.reset_index(inplace=True, drop=True)
+
+    rolling_values = carbon_df.groupby(COUNTRY_COLUMN, sort=False)[POWER_CATEGORIES].\
+        rolling(MOVING_WINDOW_SIZE, min_periods=1).mean().reset_index(drop=True)
+
+    # rolling_values.rename(columns={col: col + ROLLING_SUFFIX for col in rolling_values.columns}, inplace=True)
+
+    carbon_df[[col + ROLLING_SUFFIX for col in rolling_values.columns]] = rolling_values
+
+    # carbon_df = pd.merge(carbon_df, rolling_values, on=[COUNTRY_COLUMN, DATE_COLUMN], how='inner')
+
+
+
     return carbon_df
 
 
