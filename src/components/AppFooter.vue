@@ -18,7 +18,6 @@ export default {
 <style scoped>
 .app-footer {
   width: 100vw;
-  background-color: lightgray;
 }
 
 a {
