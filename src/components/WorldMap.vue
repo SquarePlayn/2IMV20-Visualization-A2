@@ -1,6 +1,6 @@
 <template>
   <b-row>
-    <svg class="w-100 h-100 world-map">
+    <svg class="w-100 h-100 world-map" id="world-map">
       <g id="svg-world"/>
       <g id="svg-centers"/>
     </svg>
@@ -99,6 +99,13 @@ export default {
           d3.select(this).classed("hovered", false);
         })
       ;
+
+
+      d3.select("#world-map")
+          .call(d3.zoom().on("zoom", function (event) {
+            d3.select('#svg-world').attr("transform", event.transform);
+            d3.select('#svg-centers').attr("transform", event.transform);
+          }));
     },
 
     createCenters() {
