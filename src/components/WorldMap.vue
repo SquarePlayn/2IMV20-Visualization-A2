@@ -143,6 +143,39 @@ export default {
         return;
       }
 
+      // Update the countries
+      d3.select("#svg-world")
+        .selectAll('path')
+        .transition()
+        .duration(1)
+        .attr('fill', (d) => {
+          // return '#ffffff';
+          const countryName = d.properties.name;
+          const countryDataToday = dateData[countryName];
+          const countryDataYesterday = yesterdayData[countryName];
+          if (countryDataToday !== undefined && countryDataYesterday !== undefined) {
+            // Color based on change
+            const covidCountToday = countryDataToday[this.settings.covidCount.selected];
+            const covidCountYesterday = countryDataYesterday[this.settings.covidCount.selected];
+
+            const change = (covidCountToday - covidCountYesterday) / covidCountYesterday;
+
+            const lower = -0.05;
+            const upper = 0.05;
+
+            const r = change < 0 ? 0 : 255 * (change / upper);
+            const g = change > 0 ? 0 : 255 * (change / lower);
+            const b = 0;
+            const col = `rgb(${r}, ${g}, ${b})`;
+            // console.log(`Setting ${countryName} to color ${col}`);
+            // console.log(countryDataToday)
+            // console.log(countryDataYesterday)
+            return col;
+          } else {
+            return '#cccccc';
+          }
+        });
+
       // Update the country circles
       d3.select('#svg-centers')
         .selectAll('circle')
@@ -186,7 +219,6 @@ export default {
 
 <style>
 .country {
-  fill: #cccccc;
   stroke: #333333;
   stroke-width: 0.5;
 }
