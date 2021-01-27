@@ -232,14 +232,19 @@ def create_main_dataframe() -> pd.DataFrame:
 def dump_json_to_disk(total_df: pd.DataFrame):
     """Dumps the total result to the disk in json format"""
 
-    # def row_to_dict(row):
-    #     return {col: row[col] for col in [CONFIRMED_COLUMN, DEATHS_COLUMN, RECOVERED_COLUMN, POWER_COLUMN]}
-    #
-    # def merge(x):
-    #     return {row[COUNTRY_COLUMN]: row_to_dict(row) for idx, row in x.iterrows()}
+    columns = list(total_df.columns)
 
-    # dict_format = total_df.groupby(DATE_COLUMN, as_index=True).apply(merge)
-    dict_format = total_df.to_dict()
+    columns.remove(DATE_FANCY_COLUMN)
+    columns.remove(DATE_COLUMN)
+
+    def row_to_dict(row):
+        return {col: row[col] for col in columns}
+
+    def merge(x):
+        return {row[COUNTRY_COLUMN]: row_to_dict(row) for idx, row in x.iterrows()}
+
+    restructured_df = total_df.groupby(DATE_COLUMN, as_index=True).apply(merge)
+    dict_format = restructured_df.to_dict()
 
     # json_result = json.dumps(dict_format)
     with open("../public/data/dataset.json", "w") as f:
