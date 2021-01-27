@@ -243,6 +243,8 @@ def dump_json_to_disk(total_df: pd.DataFrame):
     def merge(x):
         return {row[COUNTRY_COLUMN]: row_to_dict(row) for idx, row in x.iterrows()}
 
+    total_df.fillna("NULL", inplace=True)
+
     restructured_df = total_df.groupby(DATE_COLUMN, as_index=True).apply(merge)
     dict_format = restructured_df.to_dict()
 
