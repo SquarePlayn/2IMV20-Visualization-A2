@@ -20,7 +20,7 @@
 
       <b-col cols="8">
         <!-- World Map -->
-        <world-map :data="data" :settings="settings" :time="time"/>
+        <world-map :data="data" :settings="settings" :time="time" :selectedCountry="selectedCountry"/>
 
         <!-- Time Controls -->
         <time-controls v-model="time"/>
@@ -31,7 +31,7 @@
 
       <!-- Emission Excerpt -->
       <b-col cols="2" align-h="left">
-        <emission-excerpt :data="data" :settings="settings" :time="time"/>
+        <emission-excerpt :data="data" :settings="settings" :time="time" :selectedCountry="selectedCountry"/>
       </b-col>
     </b-row>
     <!-- Footer -->
@@ -61,6 +61,11 @@ export default {
       dataLoaded: false,
 
       time: 0,
+
+      selectedCountry: {
+        label: 'Country',
+        selected: 'country'
+      },
 
       settings: {
         // Split emission on [sector, country]

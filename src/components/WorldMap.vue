@@ -14,7 +14,7 @@ import {utility} from "../mixins/utility";
 
 export default {
   name: "WorldMap",
-  props: ['data', 'settings', 'time'],
+  props: ['data', 'settings', 'time', 'selectedCountry'],
   mixins: [utility],
 
   data() {
@@ -22,8 +22,6 @@ export default {
       // Data sets for country lines and centers
       countries: null,
       centers: null,
-
-      selectedCountryName: null,
 
       // Currently selected country
       selected: null,
@@ -88,6 +86,7 @@ export default {
             // On clicking a country, give it the selected class and store it in the selected variable
             d3.select(this).classed('selected', true);
             that.settings.country.selected = d.target.__data__.properties.name;
+            that.selectedCountry.selected = d.target.__data__.properties.name;
             // console.log(this.selectedCountryName);
             if (that.selected) {
               d3.select(that.selected).classed('selected', false);

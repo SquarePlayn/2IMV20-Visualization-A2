@@ -24,7 +24,7 @@ stockInit(Highcharts)
 
 export default {
   name: "EmissionExcerpt",
-  props: ['data', 'settings', 'time'],
+  props: ['data', 'settings', 'time', 'selectedCountry'],
   mixins: [utility],
   data() {
     return {
@@ -87,17 +87,22 @@ export default {
 
   watch: {
     time: 'updateChart',
+    'selectedCountry.selected':  'updateChart'
   },
 
   methods: {
     updateChart(){
 
       const dateFormatted = this.formatDate(this.time);
-      console.log(dateFormatted);
       const dateData = this.data[dateFormatted];
-      console.log((dateData['Brazil'])['Emissions']);
-      this.chartOptions.series[0].data = [125,39, 78, 100, 89];
+      const countryData = dateData[this.selectedCountry.selected];
+      console.log(countryData['Emissions']);
+      const emissions = countryData['Emissions'];
+      this.chartOptions.series[0].data = [emissions['Power'], emissions['Ground Transport'], emissions['Industry'], emissions['Residential'], emissions['Domestic Aviation']];
+     // this.chartOptions.series[0].data = [125,39, 78, 100, 89];
       console.log(this.settings.country.selected);
+      console.log(this.selectedCountry.selected);
+      //console.log(this.selectedCountry);
     },
 
   },
