@@ -96,13 +96,7 @@ export default {
       const dateFormatted = this.formatDate(this.time);
       const dateData = this.data[dateFormatted];
       const countryData = dateData[this.selectedCountry.selected];
-      console.log(countryData['Emissions']);
-      const emissions = countryData['Emissions'];
-      this.chartOptions.series[0].data = [emissions['Power'], emissions['Ground Transport'], emissions['Industry'], emissions['Residential'], emissions['Domestic Aviation']];
-     // this.chartOptions.series[0].data = [125,39, 78, 100, 89];
-      console.log(this.settings.country.selected);
-      console.log(this.selectedCountry.selected);
-      //console.log(this.selectedCountry);
+      this.chartOptions.series[0].data = [countryData['Power'], countryData['Ground Transport'], countryData['Industry'], countryData['Residential'], countryData['Domestic Aviation']];
     },
 
   },
