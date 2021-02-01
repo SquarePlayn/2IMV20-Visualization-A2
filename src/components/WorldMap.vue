@@ -14,7 +14,7 @@ import { utility } from "../mixins/utility";
 import _ from 'lodash';
 
 export default {
-  name: "WorldMap",
+  me: "WorldMap",
   props: ['data', 'settings', 'time'],
   mixins: [utility],
 
@@ -26,6 +26,7 @@ export default {
 
       // Currently selected country
       selected: null,
+      hovered: null,
 
       // Geo coordinates to 2d coordinates projection
       projection: d3.geoMercator().scale(140).translate([1250 / 2, 460 / 1.4])
@@ -49,6 +50,8 @@ export default {
   watch: {
     time: 'updateMap',
     'settings.covidCount.selected': 'updateMap',
+    selected: 'updateMap',
+    hovered: 'updateMap',
   },
 
   methods: {
@@ -100,7 +103,6 @@ export default {
     },
 
     createWorld() {
-      const that = this;
       const g = d3.select('#svg-world');
       const path = d3.geoPath(this.projection);
       g.selectAll('.country')
@@ -109,39 +111,41 @@ export default {
         .append('path')
         .attr('class', 'country')
         .attr('d', path)
-        .on('click', function(event, d) {
+        .on('click', (event, d) => {
           // On clicking a country, give it the selected class and store it in the selected variable
-          const name = that.convertCountryName(d.properties.name);
-          if (that.isClickable(name)) { // But only if this is a clickable country
-            if (that.selected === name) {
+          const name = this.convertCountryName(d.properties.name);
+          if (this.isClickable(name)) { // But only if this is a clickable country
+            if (this.selected === name) {
               // It was already selected, unselect it
-              that.selected = '';
+              this.selected = null;
             } else {
               // Select it
-              that.selected = name;
+              this.selected = name;
             }
-            that.updateMap();
           }
         })
-        .on('mouseover', function(event, d) {
+        .on('mouseover', (event, d) => {
           // Detect hovering over
-          if (that.isClickable(d.properties.name)) {
-            d3.select(this).classed("hovered", true);
+          if (this.isClickable(d.properties.name)) {
+            this.hovered = this.convertCountryName(d.properties.name);
           }
         })
-        .on('mouseout', function(event, d) {
-          if (that.isClickable(d.properties.name)) {
+        .on('mouseout', (event, d) => {
+          if (this.isClickable(d.properties.name)) {
             // Reset hovered when moving mouse away
-            d3.select(this).classed("hovered", false);
+            this.hovered = null;
           }
         });
 
       // Make the map zoomable and pannable
       d3.select("#world-map")
-          .call(d3.zoom().on("zoom", function (event) {
-            d3.select('#svg-world').attr("transform", event.transform);
-            d3.select('#svg-centers').attr("transform", event.transform);
-          }));
+        .call(d3.zoom().on("zoom", function (event) {
+          d3.select('#svg-world').attr("transform", event.transform);
+          d3.select('#svg-centers').attr("transform", event.transform);
+        }));
+
+      // Set them to the right properties for the current time
+      this.updateMap();
     },
 
     createCenters() {
@@ -152,11 +156,11 @@ export default {
         _.filter(
           this.dateData,
           country => this.isClickable(country["Country"])
-        ), country => { return {
+        ), country => ({
           long: country["Country"] === 'World' ? '-140' : country["Long"],
           lat: country["Country"] === 'World' ? '-20' : country["Lat"],
           name: country["Country"],
-       };});
+        }));
 
       // Create the circles
       d3.select('#svg-centers')
@@ -172,6 +176,24 @@ export default {
         })
         .attr('cy', (d) => {
           return this.projection([d.long, d.lat])[1];
+        })
+        .on('click', (event, d) => {
+          const name = d.name;
+          if (this.selected === name) {
+            // It was already selected, unselect it
+            this.selected = null;
+          } else {
+            // Select it
+            this.selected = name;
+          }
+          this.updateMap();
+        })
+        .on('mouseover', (event, d) => {
+          // Detect hovering over
+          this.hovered = d.name;
+        })
+        .on('mouseout', (event, d) => {
+          this.hovered = null;
         });
 
       // Set them to the right properties for the current time
@@ -195,10 +217,10 @@ export default {
       }
 
       // Update the countries
-      const that = this;
       d3.select("#svg-world")
         .selectAll('path')
-        .classed('selected', (d) => this.convertCountryName(d.properties.name) === that.selected)
+        .classed('selected', (d) => this.convertCountryName(d.properties.name) === this.selected)
+        .classed('hovered', (d) => this.convertCountryName(d.properties.name) === this.hovered)
         .transition()
         .duration(10)
         .attr('fill', (d) => {
@@ -214,6 +236,8 @@ export default {
       // Update the country circles
       d3.select('#svg-centers')
         .selectAll('circle')
+        .classed('selected-center', (d) => d.name === this.selected)
+        .classed('hovered', (d) => d.name === this.hovered)
         .transition()
         .duration(1)
         .attr('r', (d) => {
@@ -256,6 +280,10 @@ export default {
 
 .selected {
   fill: yellow !important;
+}
+
+.selected-center {
+    stroke: yellow !important;
 }
 
 .hovered {
