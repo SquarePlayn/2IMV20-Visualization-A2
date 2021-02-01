@@ -11,6 +11,7 @@
 import * as d3 from 'd3/dist/d3';
 import * as topojson from 'topojson/dist/topojson';
 import { utility } from "../mixins/utility";
+import _ from 'lodash';
 
 export default {
   name: "WorldMap",
@@ -32,13 +33,9 @@ export default {
   },
 
   computed: {
-    width() {
-      return 1250;
-    },
-
-    height() {
-      return 460;
-    },
+    dateData() {
+      return this.data[this.formatDate(this.time)];
+    }
   },
 
   mounted() {
@@ -72,6 +69,30 @@ export default {
         })
     },
 
+    /**
+     * Get the data of the selected day of a country
+     * @param countryName
+     * @return Object
+     */
+    getDateDataOfCountry(countryName) {
+      countryName = this.convertCountryName(countryName);
+      if (!(countryName in this.dateData)) {
+        console.error("Missing data for country '" + countryName + "'.");
+        return null;
+      }
+      return this.dateData[countryName];
+    },
+
+    /**
+     * Check whether a country should be possible to be clicked / selected
+     * @param countryName
+     * @return boolean
+     */
+    isClickable(countryName) {
+      // TODO Switch back to "Has Carbon" once dataset is fixed
+      return this.getDateDataOfCountry(countryName)["Has Covid"];
+    },
+
     createWorld() {
       const that = this;
       const g = d3.select('#svg-world');
@@ -82,25 +103,28 @@ export default {
         .append('path')
         .attr('class', 'country')
         .attr('d', path)
-        .on('click', function(d) {
+        .on('click', function(event, d) {
           // On clicking a country, give it the selected class and store it in the selected variable
-          d3.select(this).classed('selected', true);
-          if (that.selected) {
-            d3.select(that.selected).classed('selected', false);
+          const name = that.convertCountryName(d.properties.name);
+          if (that.isClickable(name)) { // But only if this is a clickable country
+            that.selected = name;
+            that.updateMap();
           }
-          that.selected = this;
         })
-        .on('mouseover', function(d) {
+        .on('mouseover', function(event, d) {
           // Detect hovering over
-          d3.select(this).classed("hovered", true);
+          if (that.isClickable(d.properties.name)) {
+            d3.select(this).classed("hovered", true);
+          }
         })
-        .on('mouseout', function(d) {
-          // Reset hovered when moving mouse away
-          d3.select(this).classed("hovered", false);
-        })
-      ;
+        .on('mouseout', function(event, d) {
+          if (that.isClickable(d.properties.name)) {
+            // Reset hovered when moving mouse away
+            d3.select(this).classed("hovered", false);
+          }
+        });
 
-
+      // Make the map zoomable and pannable
       d3.select("#world-map")
           .call(d3.zoom().on("zoom", function (event) {
             d3.select('#svg-world').attr("transform", event.transform);
@@ -110,6 +134,20 @@ export default {
 
     createCenters() {
       //  https://developers.google.com/public-data/docs/canonical/countries_csv
+
+      console.log(this.dateData);
+      // Filter out only countries that have center data
+      const countryCoords = _.map(
+        _.filter(
+          this.dateData,
+          country => this.isClickable(country["Country"])
+        ), country => { return {
+          long: country["Long"],
+          lat: country["Lat"],
+          name: country["Country"],
+       };});
+
+      console.log(countryCoords);
 
       // Create the circles
       d3.select('#svg-centers')
@@ -132,31 +170,30 @@ export default {
     },
 
     updateMap() {
-      // Get the data of the selected day
-      const dateFormatted = this.formatDate(this.time);
-      const dateData = this.data[dateFormatted];
-
-      // Get the data of yesterday, if possible
-      const dateYesterday = this.formatDate(this.time - 1);
-      const yesterdayData = this.data[dateYesterday];
-
       // If there is no data for this date, don't do anything
-      if (dateData === undefined) {
-        console.log("Missing date: " + dateFormatted);
-        return;
-      }
-      if (yesterdayData === undefined) {
-        // If yesterday is undefined, also don't do anything but no logging
+      if (this.dateData === undefined) {
+        console.log("Missing date: " + this.formatDate(this.time));
         return;
       }
 
       // Update the countries
+      const that = this;
       d3.select("#svg-world")
         .selectAll('path')
+        .classed('selected', function (d) {
+          console.log("Checking selected of");
+          console.log(d);
+          return ;
+        })
         .transition()
         .duration(1)
         .attr('fill', (d) => {
-          // return '#ffffff';
+          const isSelected = that.convertCountryName(d.properties.name) === that.selected;
+          if (isSelected) {
+            return 'yellow';
+          }
+
+          return '#ffffff';
           const countryName = d.properties.name;
           const countryDataToday = dateData[countryName];
           const countryDataYesterday = yesterdayData[countryName];
@@ -182,6 +219,8 @@ export default {
             return '#cccccc';
           }
         });
+
+      return;
 
       // Update the country circles
       d3.select('#svg-centers')

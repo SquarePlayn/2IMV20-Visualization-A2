@@ -1,3 +1,10 @@
+const COUNTRY_NAME_EXCEPTIONS = {
+    'United States of America': 'United States',
+    'Dominican Rep.': 'Dominican Republic',
+};
+
+
+
 export const utility = {
   methods: {
     /**
@@ -16,6 +23,14 @@ export const utility = {
 
         // Output YYYY-MM-DD representation
         return date.toISOString().split('T')[0];
+    },
+
+    convertCountryName(countryName) {
+        if (countryName in COUNTRY_NAME_EXCEPTIONS) {
+            return COUNTRY_NAME_EXCEPTIONS[countryName];
+        } else {
+            return countryName;
+        }
     },
   },
 };
