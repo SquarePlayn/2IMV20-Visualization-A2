@@ -3,6 +3,7 @@
     <svg class="w-100 h-100 world-map" id="world-map">
       <g id="svg-world"/>
       <g id="svg-centers"/>
+      <g id="world-label"/>
     </svg>
   </b-row>
 </template>
@@ -142,6 +143,7 @@ export default {
         .call(d3.zoom().on("zoom", function (event) {
           d3.select('#svg-world').attr("transform", event.transform);
           d3.select('#svg-centers').attr("transform", event.transform);
+          d3.select('#world-label').attr("transform", event.transform);
         }));
 
       // Set them to the right properties for the current time
@@ -157,8 +159,8 @@ export default {
           this.dateData,
           country => this.isClickable(country["Country"])
         ), country => ({
-          long: country["Country"] === 'World' ? '-140' : country["Long"],
-          lat: country["Country"] === 'World' ? '-20' : country["Lat"],
+          long: country["Country"] === 'World' ? -140 : country["Long"],
+          lat: country["Country"] === 'World' ? -20 : country["Lat"],
           name: country["Country"],
         }));
 
@@ -195,6 +197,19 @@ export default {
         .on('mouseout', (event, d) => {
           this.hovered = null;
         });
+
+      // Create the label above the World circle
+      const textLong = -140;
+      const textLat = 15;
+      d3.select('#world-label')
+        .selectAll('.world-label')
+        .data(["World other"])
+        .enter()
+        .append("svg:text")
+        .text((d) => d)
+        .attr('class', 'world-label')
+        .attr('x', () => this.projection([textLong, textLat])[0])
+        .attr('y', () => this.projection([textLong, textLat])[1])
 
       // Set them to the right properties for the current time
       this.updateMap();
@@ -288,5 +303,10 @@ export default {
 
 .hovered {
   fill: gray;
+}
+
+.world-label {
+  text-anchor: middle;
+  font-size: 20pt;
 }
 </style>
