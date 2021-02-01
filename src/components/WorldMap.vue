@@ -107,7 +107,13 @@ export default {
           // On clicking a country, give it the selected class and store it in the selected variable
           const name = that.convertCountryName(d.properties.name);
           if (that.isClickable(name)) { // But only if this is a clickable country
-            that.selected = name;
+            if (that.selected === name) {
+              // It was already selected, unselect it
+              that.selected = '';
+            } else {
+              // Select it
+              that.selected = name;
+            }
             that.updateMap();
           }
         })
@@ -169,6 +175,15 @@ export default {
       this.updateMap();
     },
 
+    getColumnFromMetric(metric) {
+      const lookup = {
+        'Confirmed': 'Confirmed Rolling Per Capita',
+        'Recovered': 'Recovered Rolling Per Capita',
+        'Deaths': 'Deaths Rolling Per Capita',
+      };
+      return lookup[metric];
+    },
+
     updateMap() {
       // If there is no data for this date, don't do anything
       if (this.dateData === undefined) {
@@ -180,44 +195,19 @@ export default {
       const that = this;
       d3.select("#svg-world")
         .selectAll('path')
-        .classed('selected', function (d) {
-          console.log("Checking selected of");
-          console.log(d);
-          return ;
-        })
+        .classed('selected', (d) => this.convertCountryName(d.properties.name) === that.selected)
         .transition()
-        .duration(1)
+        .duration(10)
         .attr('fill', (d) => {
-          const isSelected = that.convertCountryName(d.properties.name) === that.selected;
-          if (isSelected) {
-            return 'yellow';
+          const countryData = this.getDateDataOfCountry(d.properties.name);
+          if (countryData === null) {
+            return '#ffffff';
           }
 
-          return '#ffffff';
-          const countryName = d.properties.name;
-          const countryDataToday = dateData[countryName];
-          const countryDataYesterday = yesterdayData[countryName];
-          if (countryDataToday !== undefined && countryDataYesterday !== undefined) {
-            // Color based on change
-            const covidCountToday = countryDataToday[this.settings.covidCount.selected];
-            const covidCountYesterday = countryDataYesterday[this.settings.covidCount.selected];
-
-            const change = (covidCountToday - covidCountYesterday) / covidCountYesterday;
-
-            const lower = -0.05;
-            const upper = 0.05;
-
-            const r = change < 0 ? 0 : 255 * (change / upper);
-            const g = change > 0 ? 0 : 255 * (change / lower);
-            const b = 0;
-            const col = `rgb(${r}, ${g}, ${b})`;
-            // console.log(`Setting ${countryName} to color ${col}`);
-            // console.log(countryDataToday)
-            // console.log(countryDataYesterday)
-            return col;
-          } else {
-            return '#cccccc';
-          }
+          const metric = this.settings.covidCount.selected;
+          const value = countryData[this.getColumnFromMetric(metric)];
+          // console.log("For country " + d.prop)
+          return this.getCountryColor(value, metric);
         });
 
       return;

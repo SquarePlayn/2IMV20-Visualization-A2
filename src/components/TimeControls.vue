@@ -44,7 +44,7 @@ export default {
       playing: false,
       timer: null,
       min: 0, // 2020-01-22
-      max: 324, // 2020-12-11
+      max: 313, // 2020-11-30
       speed: 4, // Days per second
     };
   },
