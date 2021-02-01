@@ -43,7 +43,7 @@ export const utility = {
      */
     formatDate(intDate) {
       // Make really sure it's an int (and not e.g. a string)
-      const intDateParsed = Number(intDate);
+      const intDateParsed = Number(intDate) + 10;
 
       // Construct date `intDate` days from start of dataset
       const date = new Date('2020-01-22');
@@ -67,8 +67,14 @@ export const utility = {
      * @param metric
      */
     getCountryColor(value, metric) {
-      const lower = -0.0002;
-      const upper = 0.0002;
+      let lower, upper;
+      if (metric === 'emission change') {
+        lower = -0.5;
+        upper = 0.5;
+      } else {
+        lower = -0.0002;
+        upper = 0.0002;
+      }
 
       const r = value < 0 ? 0 : 255 * (value / upper);
       const g = value > 0 ? 0 : 255 * (value / lower);

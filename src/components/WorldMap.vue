@@ -35,7 +35,11 @@ export default {
   computed: {
     dateData() {
       return this.data[this.formatDate(this.time)];
-    }
+    },
+
+    prevDateData() {
+      return this.data[this.formatDate(this.time - 10)];
+    },
   },
 
   mounted() {
@@ -72,15 +76,17 @@ export default {
     /**
      * Get the data of the selected day of a country
      * @param countryName
+     * @param prev
      * @return Object
      */
-    getDateDataOfCountry(countryName) {
+    getDateDataOfCountry(countryName, prev) {
       countryName = this.convertCountryName(countryName);
       if (!(countryName in this.dateData)) {
         console.error("Missing data for country '" + countryName + "'.");
         return null;
       }
-      return this.dateData[countryName];
+      const data = prev ? this.prevDateData : this.dateData;
+      return data[countryName];
     },
 
     /**
@@ -141,24 +147,21 @@ export default {
     createCenters() {
       //  https://developers.google.com/public-data/docs/canonical/countries_csv
 
-      console.log(this.dateData);
       // Filter out only countries that have center data
       const countryCoords = _.map(
         _.filter(
           this.dateData,
           country => this.isClickable(country["Country"])
         ), country => { return {
-          long: country["Long"],
-          lat: country["Lat"],
+          long: country["Country"] === 'World' ? '-140' : country["Long"],
+          lat: country["Country"] === 'World' ? '-20' : country["Lat"],
           name: country["Country"],
        };});
-
-      console.log(countryCoords);
 
       // Create the circles
       d3.select('#svg-centers')
         .selectAll('.country-center')
-        .data(this.centers)
+        .data(countryCoords)
         .enter()
         .append('circle')
         .attr('class', 'country-center')
@@ -203,14 +206,10 @@ export default {
           if (countryData === null) {
             return '#ffffff';
           }
-
           const metric = this.settings.covidCount.selected;
           const value = countryData[this.getColumnFromMetric(metric)];
-          // console.log("For country " + d.prop)
           return this.getCountryColor(value, metric);
         });
-
-      return;
 
       // Update the country circles
       d3.select('#svg-centers')
@@ -219,26 +218,17 @@ export default {
         .duration(1)
         .attr('r', (d) => {
           // Size based on selected covid count
-          const countryData =  dateData[d.name];
-          const covidCount = countryData[this.settings.covidCount.selected];
-          return Math.sqrt(covidCount) / 100.0;
+          const countryData = this.getDateDataOfCountry(d.name);
+          const value = countryData['Total Emissions Rolling'];
+          return Math.sqrt(value * 50);
         })
         .attr('fill', (d) => {
           // Color based on change
-          const countryDataToday = dateData[d.name];
-          const countryDataYesterday = yesterdayData[d.name];
-          const covidCountToday = countryDataToday[this.settings.covidCount.selected];
-          const covidCountYesterday = countryDataYesterday[this.settings.covidCount.selected];
-
-          const change = (covidCountToday - covidCountYesterday) / covidCountYesterday;
-
-          const lower = -0.05;
-          const upper = 0.05;
-
-          const r = change < 0 ? 0 : 255 * (change / upper);
-          const g = change > 0 ? 0 : 255 * (change / lower);
-          const b = 0;
-          return `rgb(${r}, ${g}, ${b})`;
+          const curr = this.getDateDataOfCountry(d.name, false)['Total Emissions Rolling'];
+          const prev = this.getDateDataOfCountry(d.name, true)['Total Emissions Rolling'];
+          const diff = curr - prev;
+          const perc = diff / prev;
+          return this.getCountryColor(perc, 'emission change');
         });
     },
   }
