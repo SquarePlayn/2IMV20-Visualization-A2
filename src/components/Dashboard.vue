@@ -89,13 +89,6 @@ export default {
             {value: 'Deaths', text: 'Deaths'},
           ],
         },
-
-        // Select country (to display emission chart)
-        // TODO
-        country: {
-          label: 'Country',
-          selected: 'country'
-        }
       },
     };
   },

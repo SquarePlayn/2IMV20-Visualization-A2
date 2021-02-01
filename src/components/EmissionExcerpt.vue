@@ -1,12 +1,9 @@
 <template>
-  <!--  <b-row>
+   <b-row>
       <b-col class="emission-excerpt">
-        Emission chart excerpt at current time will go here.
+        <highcharts class="hc" :options="chartOptions" ref="chart"></highcharts>
       </b-col>
-    </b-row>-->
-  <div>
-    <highcharts class="hc" :options="chartOptions" ref="chart"></highcharts>
-  </div>
+    </b-row>
 </template>
 
 <script>
@@ -33,54 +30,40 @@ export default {
           type: "column",
         },
         title: {
-          text: "CO2 emission per sector",
+          text: "CO2 emission per sector in the World " + this.formatDate(this.time),
         },
         yAxis: {
           title: {
             text: "CO2 emission",
+            softMax: 90
           },
         },
         xAxis: {
           min: 0,
           categories: ["Power", "Ground Transport", "Industry", "Residential", "Domestic Aviation"],
-          title: {
-            text: "Sector",
-            align: "high",
-          },
           labels: {
             overflow: "justify",
           },
         },
         tooltip: {
-          valueSuffix: " millions",
+          formatter: function() {
+            return '<b>'+ this.x +'</b>: '+ Highcharts.numberFormat(this.y, 2) + 'Mt';
+          }
         },
         plotOptions: {
           bar: {
             dataLabels: {
-              enabled: true,
+              enabled: false,
             },
           },
         },
-        legend: {
-          layout: "vertical",
-          align: "right",
-          verticalAlign: "top",
-          x: -40,
-          y: 80,
-          floating: true,
-          borderWidth: 1,
-          backgroundColor:
-              (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || "#FFFFFF",
-          shadow: true,
+        legend:{
+          enabled:false
         },
         credits: {
           enabled: false,
         },
-        series: [
-          {
-            data: [107, 31, 635, 203, 2,],
-          },
-        ],
+        series: [],
       },
     };
   },
@@ -90,13 +73,59 @@ export default {
     'selectedCountry.selected':  'updateChart'
   },
 
+  mounted() {
+    this.loadInitialData();
+  },
+
   methods: {
+
+    loadInitialData(){
+      const dateFormatted = this.formatDate(this.time);
+      const dateData = this.data[dateFormatted];
+      let power = 0;
+      let gt = 0;
+      let da = 0;
+      let ind = 0;
+      let res = 0;
+
+      for (let country in dateData)
+      {
+        if (dateData[country]['Has Covid'] === true) // has to be changed to Has Carbon when the dataset is fixed
+        {
+          power += dateData[country]['Power'];
+          gt += dateData[country]['Ground Transport'];
+          da += dateData[country]['Domestic Aviation'];
+          ind += dateData[country]['Industry'];
+          res += dateData[country]['Residential'];
+        }
+      }
+
+      if (this.chartOptions.series.length === 0)
+      {
+        this.chartOptions.series.push({
+        name: '',
+        data: [power, gt, ind, res, da],
+      });
+      }
+      else
+      {
+        this.chartOptions.series[0].data = [power, gt, ind, res, da];
+      }
+    },
+
     updateChart(){
 
       const dateFormatted = this.formatDate(this.time);
       const dateData = this.data[dateFormatted];
-      const countryData = dateData[this.selectedCountry.selected];
-      this.chartOptions.series[0].data = [countryData['Power'], countryData['Ground Transport'], countryData['Industry'], countryData['Residential'], countryData['Domestic Aviation']];
+      if (this.selectedCountry.selected !== 'country')
+      {
+        const countryData = dateData[this.selectedCountry.selected];
+        this.chartOptions.series[0].data = [countryData['Power'], countryData['Ground Transport'], countryData['Industry'], countryData['Residential'], countryData['Domestic Aviation']];
+        this.chartOptions.title.text = "CO2 emission per sector in " + this.selectedCountry.selected + ' ' + this.formatDate(this.time);
+      }
+      else {
+        this.loadInitialData();
+      }
     },
 
   },
