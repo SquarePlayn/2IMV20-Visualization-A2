@@ -17,8 +17,6 @@
       <b-col cols="2" align-h="right">
         <!-- Legend -->
         <map-legend :covid-metric="this.settings.covidCount.selected"/>
-        <!-- Selectors -->
-        <selectors :settings="settings"/>
       </b-col>
 
       <b-col cols="8">
@@ -32,11 +30,18 @@
         <emission :data="data" :settings="settings" :time="time" :selectedCountry="selectedCountry"/>
       </b-col>
 
-      <!-- Emission Excerpt -->
       <b-col cols="2" align-h="left">
-        <b-row align-h="center" class="p-5">
-          <h1>{{ new Date(formatDate(this.time)).toLocaleDateString() }}</h1>
+        <b-row style="height: 48vh">
+          <b-col>
+            <!-- Time display -->
+            <b-row align-h="center" class="p-5">
+              <h1>{{ new Date(formatDate(this.time)).toLocaleDateString() }}</h1>
+            </b-row>
+            <!-- Selectors -->
+            <selectors :settings="settings"/>
+          </b-col>
         </b-row>
+        <!-- Emission Excerpt -->
         <emission-excerpt :data="data" :settings="settings" :time="time" :selectedCountry="selectedCountry"/>
       </b-col>
     </b-row>

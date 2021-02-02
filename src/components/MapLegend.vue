@@ -3,7 +3,7 @@
         <b-col cols="12">
             <template v-for="topic in TOPICS" v-if="topic.ifMetric === null || topic.ifMetric === covidMetric">
                 <!-- Country color: covid metric per capita. 0, 0.0001, 0.0002 -->
-                <b-row class="legend-header pt-2">
+                <b-row class="legend-header pt-3">
                     <h5>{{ topic.label }}</h5>
                 </b-row>
                 <b-row align-v="center" v-for="value in topic.values" :key="value.img">
