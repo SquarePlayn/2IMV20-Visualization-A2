@@ -31,6 +31,9 @@
 
       <!-- Emission Excerpt -->
       <b-col cols="2" align-h="left">
+        <b-row align-h="center" class="p-5">
+          <h1>{{ new Date(formatDate(this.time)).toLocaleDateString() }}</h1>
+        </b-row>
         <emission-excerpt :data="data" :settings="settings" :time="time" :selectedCountry="selectedCountry"/>
       </b-col>
     </b-row>
@@ -49,9 +52,11 @@ import TimeControls from "@/components/TimeControls";
 import Emission from "@/components/Emission";
 import AppFooter from "@/components/AppFooter";
 import AppHeader from "@/components/AppHeader";
+import {utility} from "@/mixins/utility";
 
 export default {
   name: "Dashboard",
+  mixins: [utility],
 
   components: {AppHeader, AppFooter, Emission, TimeControls, EmissionExcerpt, WorldMap, Selectors},
 
