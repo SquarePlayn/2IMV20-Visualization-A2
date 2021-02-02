@@ -1,19 +1,21 @@
 <template>
   <b-row class="selectors justify-content-center">
-    <!-- Form group for every setting -->
-    <b-form-group
-      class="setting"
-      v-for="(setting, key) in settings"
-      :id="`selector-${key}`"
-      :label="setting.label"
-    >
-      <!-- Use button style radio input -->
-      <b-form-radio-group
-        v-model="setting.selected"
-        :options="setting.options"
-        buttons
-      />
-    </b-form-group>
+      <b-col cols="12">
+        <!-- Form group for every setting -->
+        <b-form-group
+          class="setting"
+          v-for="(setting, key) in settings"
+          :id="`selector-${key}`"
+          :label="setting.label"
+        >
+          <!-- Use button style radio input -->
+          <b-form-radio-group
+            v-model="setting.selected"
+            :options="setting.options"
+            buttons
+          />
+        </b-form-group>
+      </b-col>
   </b-row>
 </template>
 
