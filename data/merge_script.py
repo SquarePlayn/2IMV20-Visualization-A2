@@ -24,7 +24,8 @@ HAS_CARBON = "Has Carbon"
 HAS_COVID = "Has Covid"
 HAS_BOTH = "Has Both"
 
-POWER_CATEGORIES = [TOTAL_EMISSIONS_COLUMN, "Power", "Ground Transport", "Industry", "Residential", "Domestic Aviation"]
+POWER_CATEGORIES = [TOTAL_EMISSIONS_COLUMN, LAST_YEAR_EMISSIONS_COLUMN, "Power", "Ground Transport", "Industry",
+                    "Residential", "Domestic Aviation"]
 COUNTRIES = ["Brazil", "China", "France", "Germany", "India", "Italy", "Japan", "Russia", "Spain", "United Kingdom",
              "United States"]
 
@@ -209,8 +210,7 @@ def preprocess_main_dataframe(total_df: pd.DataFrame) -> pd.DataFrame:
 
     covid_categories = [CONFIRMED_COLUMN, DEATHS_COLUMN, RECOVERED_COLUMN]
     base_categories = covid_categories + POWER_CATEGORIES
-    all_categories = base_categories + \
-                     [col + ROLLING_SUFFIX for col in base_categories] + \
+    all_categories = [col + ROLLING_SUFFIX for col in base_categories] + \
                      [col + CUMULATIVE_SUFFIX for col in covid_categories]
 
     per_capita_values = total_df[all_categories].div(total_df[POPULATION_COLUMN], axis=0)
@@ -219,8 +219,7 @@ def preprocess_main_dataframe(total_df: pd.DataFrame) -> pd.DataFrame:
 
     total_df = total_df[
         [DATE_FANCY_COLUMN, POPULATION_COLUMN, HAS_BOTH, HAS_COVID, HAS_CARBON, LAT_COLUMN, LONG_COLUMN, DATE_COLUMN,
-         COUNTRY_COLUMN, LAST_YEAR_EMISSIONS_COLUMN,
-         *all_categories, *[col + PER_CAPITA_SUFFIX for col in all_categories]]
+         COUNTRY_COLUMN, *base_categories, *all_categories, *[col + PER_CAPITA_SUFFIX for col in all_categories]]
     ]
 
     return total_df
