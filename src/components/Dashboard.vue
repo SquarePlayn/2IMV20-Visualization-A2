@@ -69,7 +69,7 @@ export default {
 
       selectedCountry: {
         label: 'Country',
-        selected: 'country'
+        selected: null,
       },
 
       settings: {

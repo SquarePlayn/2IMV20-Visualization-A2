@@ -116,14 +116,14 @@ export default {
           // On clicking a country, give it the selected class and store it in the selected variable
           const name = this.convertCountryName(d.properties.name);
           if (this.isClickable(name)) { // But only if this is a clickable country
-          this.selectedCountry.selected = this.selected;
-          console.log(this.selectedCountry.selected);
             if (this.selected === name) {
               // It was already selected, unselect it
+              this.selectedCountry.selected = null;
               this.selected = null;
             } else {
-              // Select it
               this.selected = name;
+              // Select it
+              this.selectedCountry.selected = this.selected;
             }
           }
         })
@@ -186,9 +186,11 @@ export default {
           if (this.selected === name) {
             // It was already selected, unselect it
             this.selected = null;
+            this.selectedCountry.selected = null;
           } else {
             // Select it
             this.selected = name;
+            this.selectedCountry.selected = name;
           }
           this.updateMap();
         })
