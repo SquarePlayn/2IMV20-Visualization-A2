@@ -93,7 +93,7 @@ export default {
      * @return boolean
      */
     isClickable(countryName) {
-      return this.getDateDataOfCountry(countryName)["Has Carbon"];
+      return false;//this.getDateDataOfCountry(countryName)["Has Carbon"];
     },
 
     createWorld() {
@@ -242,6 +242,9 @@ export default {
           }
           const metric = this.settings.covidCount.selected;
           const value = countryData[this.getColumnFromMetric(metric)];
+          if (d.properties.name === 'United States of America') {
+            console.log("Murica: " + value);
+          }
           return this.getCountryColor(value, metric);
         });
 

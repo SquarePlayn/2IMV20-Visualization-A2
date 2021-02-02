@@ -5,6 +5,7 @@
         <b-form-group
           class="setting"
           v-for="(setting, key) in settings"
+          :key="key"
           :id="`selector-${key}`"
           :label="setting.label"
         >

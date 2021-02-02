@@ -15,6 +15,9 @@
 
       <!-- Selectors -->
       <b-col cols="2" align-h="right">
+        <!-- Legend -->
+        <map-legend />
+        <!-- Selectors -->
         <selectors :settings="settings"/>
       </b-col>
 
@@ -52,13 +55,14 @@ import TimeControls from "@/components/TimeControls";
 import Emission from "@/components/Emission";
 import AppFooter from "@/components/AppFooter";
 import AppHeader from "@/components/AppHeader";
+import MapLegend from "@/components/MapLegend";
 import {utility} from "@/mixins/utility";
 
 export default {
   name: "Dashboard",
   mixins: [utility],
 
-  components: {AppHeader, AppFooter, Emission, TimeControls, EmissionExcerpt, WorldMap, Selectors},
+  components: {MapLegend, AppHeader, AppFooter, Emission, TimeControls, EmissionExcerpt, WorldMap, Selectors},
 
   data() {
     return {
