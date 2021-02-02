@@ -196,7 +196,7 @@ export default {
       const textLat = 15;
       d3.select('#world-label')
         .selectAll('.world-label')
-        .data(["World other"])
+        .data(["Other countries"])
         .enter()
         .append("svg:text")
         .text((d) => d)

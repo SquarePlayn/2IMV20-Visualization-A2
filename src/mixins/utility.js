@@ -68,16 +68,29 @@ export const utility = {
      */
     getCountryColor(value, metric) {
       let lower, upper;
+
       if (metric === 'emission change') {
         lower = -0.5;
         upper = 0.5;
-      } else {
-        lower = -0.0002;
-        upper = 0.0002;
+      } else if (metric === 'Recovered'){
+        lower = -0.0001;
+        upper = 0.0001;
+      }else{
+        lower = -0.0003;
+        upper = 0.0003;
       }
 
-      const r = value < 0 ? 0 : 255 * (value / upper) ** 0.25;
-      const g = value > 0 ? 0 : 255 * (value / lower) ** 0.25;
+      let r, g;
+
+      console.info(metric);
+
+      if (metric === 'Recovered') {
+        g = value < 0 ? 0 : 255 * (value / upper) ** 0.5;
+        r = value > 0 ? 0 : 255 * (value / lower) ** 0.5;
+      } else {
+        r = value < 0 ? 0 : 255 * (value / upper) ** 0.5;
+        g = value > 0 ? 0 : 255 * (value / lower) ** 0.5;
+      }
       const b = 0;
       return `rgb(${r}, ${g}, ${b})`;
     },
