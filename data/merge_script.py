@@ -12,6 +12,7 @@ RECOVERED_COLUMN = 'Recovered'
 POWER_COLUMN = 'Emissions'
 POPULATION_COLUMN = "Population"
 TOTAL_EMISSIONS_COLUMN = 'Total Emissions'
+LAST_YEAR_EMISSIONS_COLUMN = 'Last Year Emissions'
 LAT_COLUMN = 'Lat'
 LONG_COLUMN = 'Long'
 
@@ -23,7 +24,8 @@ HAS_CARBON = "Has Carbon"
 HAS_COVID = "Has Covid"
 HAS_BOTH = "Has Both"
 
-POWER_CATEGORIES = [TOTAL_EMISSIONS_COLUMN, "Power", "Ground Transport", "Industry", "Residential", "Domestic Aviation"]
+POWER_CATEGORIES = [TOTAL_EMISSIONS_COLUMN, LAST_YEAR_EMISSIONS_COLUMN, "Power", "Ground Transport", "Industry",
+                    "Residential", "Domestic Aviation"]
 COUNTRIES = ["Brazil", "China", "France", "Germany", "India", "Italy", "Japan", "Russia", "Spain", "United Kingdom",
              "United States"]
 
@@ -171,11 +173,21 @@ def create_carbon_df() -> pd.DataFrame:
     carbon_df = pd.DataFrame(carbon_df.apply(df_to_dict_func, axis=1).to_list())
 
     carbon_df[DATE_COLUMN] = pd.to_datetime(carbon_df[DATE_COLUMN], format="%d/%m/%Y")
-    carbon_df = carbon_df[
-        (carbon_df[DATE_COLUMN] >= CARBON_DATE_RANGE[0]) & (carbon_df[DATE_COLUMN] <= CARBON_DATE_RANGE[1])]
 
     carbon_df.sort_values(by=[COUNTRY_COLUMN, DATE_COLUMN], inplace=True)
     carbon_df.reset_index(inplace=True, drop=True)
+
+    last_year_carbon_df = carbon_df[(carbon_df[DATE_COLUMN] >= (CARBON_DATE_RANGE[0] - datetime.timedelta(days=366))) &
+                                    (carbon_df[DATE_COLUMN] <= (CARBON_DATE_RANGE[1] - datetime.timedelta(days=365)))]
+
+    last_year_carbon_df.loc[:, DATE_COLUMN] += datetime.timedelta(days=366)
+    last_year_carbon_df.rename(columns={TOTAL_EMISSIONS_COLUMN: LAST_YEAR_EMISSIONS_COLUMN}, inplace=True)
+    last_year_carbon_df = last_year_carbon_df[[DATE_COLUMN, COUNTRY_COLUMN, LAST_YEAR_EMISSIONS_COLUMN]]
+
+    carbon_df = carbon_df[
+        (carbon_df[DATE_COLUMN] >= CARBON_DATE_RANGE[0]) & (carbon_df[DATE_COLUMN] <= CARBON_DATE_RANGE[1])]
+
+    carbon_df = pd.merge(carbon_df, last_year_carbon_df, on=[COUNTRY_COLUMN, DATE_COLUMN], how='left')
 
     rolling_values = carbon_df.groupby(COUNTRY_COLUMN, sort=False)[POWER_CATEGORIES]. \
         rolling(MOVING_WINDOW_SIZE, min_periods=1).mean().reset_index(drop=True)
@@ -191,15 +203,14 @@ def preprocess_main_dataframe(total_df: pd.DataFrame) -> pd.DataFrame:
     total_df[DATE_FANCY_COLUMN] = total_df[DATE_COLUMN].apply(lambda x: x.strftime('%d %b %Y'))
     total_df[DATE_COLUMN] = total_df[DATE_COLUMN].apply(lambda x: x.strftime('%Y-%m-%d'))
 
-    total_df[HAS_CARBON] = (total_df["_merge"] == "right_only") | (total_df["_merge"] == "both")
-    total_df[HAS_COVID] = (total_df["_merge"] == "left_only") | (total_df["_merge"] == "both")
+    total_df[HAS_COVID] = (total_df["_merge"] == "right_only") | (total_df["_merge"] == "both")
+    total_df[HAS_CARBON] = (total_df["_merge"] == "left_only") | (total_df["_merge"] == "both")
     total_df[HAS_BOTH] = (total_df["_merge"] == "both")
     total_df.drop(columns=["_merge"], inplace=True)
 
     covid_categories = [CONFIRMED_COLUMN, DEATHS_COLUMN, RECOVERED_COLUMN]
     base_categories = covid_categories + POWER_CATEGORIES
-    all_categories = base_categories + \
-                     [col + ROLLING_SUFFIX for col in base_categories] + \
+    all_categories = [col + ROLLING_SUFFIX for col in base_categories] + \
                      [col + CUMULATIVE_SUFFIX for col in covid_categories]
 
     per_capita_values = total_df[all_categories].div(total_df[POPULATION_COLUMN], axis=0)
@@ -208,8 +219,7 @@ def preprocess_main_dataframe(total_df: pd.DataFrame) -> pd.DataFrame:
 
     total_df = total_df[
         [DATE_FANCY_COLUMN, POPULATION_COLUMN, HAS_BOTH, HAS_COVID, HAS_CARBON, LAT_COLUMN, LONG_COLUMN, DATE_COLUMN,
-         COUNTRY_COLUMN,
-         *all_categories, *[col + PER_CAPITA_SUFFIX for col in all_categories]]
+         COUNTRY_COLUMN, *base_categories, *all_categories, *[col + PER_CAPITA_SUFFIX for col in all_categories]]
     ]
 
     return total_df
