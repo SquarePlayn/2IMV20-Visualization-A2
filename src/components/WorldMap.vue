@@ -38,10 +38,6 @@ export default {
     dateData() {
       return this.data[this.formatDate(this.time)];
     },
-
-    prevDateData() {
-      return this.data[this.formatDate(this.time - 10)];
-    },
   },
 
   mounted() {
@@ -80,17 +76,15 @@ export default {
     /**
      * Get the data of the selected day of a country
      * @param countryName
-     * @param prev
      * @return Object
      */
-    getDateDataOfCountry(countryName, prev) {
+    getDateDataOfCountry(countryName) {
       countryName = this.convertCountryName(countryName);
       if (!(countryName in this.dateData)) {
         console.error("Missing data for country '" + countryName + "'.");
         return null;
       }
-      const data = prev ? this.prevDateData : this.dateData;
-      return data[countryName];
+      return this.dateData[countryName];
     },
 
     /**
@@ -99,8 +93,7 @@ export default {
      * @return boolean
      */
     isClickable(countryName) {
-      // TODO Switch back to "Has Carbon" once dataset is fixed
-      return this.getDateDataOfCountry(countryName)["Has Covid"];
+      return this.getDateDataOfCountry(countryName)["Has Carbon"];
     },
 
     createWorld() {
@@ -263,8 +256,8 @@ export default {
         })
         .attr('fill', (d) => {
           // Color based on change
-          const curr = this.getDateDataOfCountry(d.name, false)['Total Emissions Rolling'];
-          const prev = this.getDateDataOfCountry(d.name, true)['Total Emissions Rolling'];
+          const curr = this.getDateDataOfCountry(d.name)['Total Emissions Rolling'];
+          const prev = this.getDateDataOfCountry(d.name)['Last Year Emissions Rolling'];
           const diff = curr - prev;
           const perc = diff / prev;
           return this.getCountryColor(perc, 'emission change');
