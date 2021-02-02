@@ -57,6 +57,10 @@ def create_covid_df() -> pd.DataFrame:
 
     lat_long = covid_confirmed_df.groupby(COUNTRY_COLUMN, as_index=False).agg({LAT_COLUMN: max, LONG_COLUMN: max})
     lat_long.loc[lat_long[COUNTRY_COLUMN] == "US", COUNTRY_COLUMN] = "United States"
+    lat_long.loc[lat_long[COUNTRY_COLUMN] == "France", LAT_COLUMN] = 46.227638
+    lat_long.loc[lat_long[COUNTRY_COLUMN] == "France", LONG_COLUMN] = 2.213749
+    lat_long.loc[lat_long[COUNTRY_COLUMN] == "China", LAT_COLUMN] = 35.86166
+    lat_long.loc[lat_long[COUNTRY_COLUMN] == "China", LONG_COLUMN] = 104.195397
 
     covid_confirmed_df = map_covid_names_and_filter(covid_confirmed_df)
     covid_deaths_df = map_covid_names_and_filter(covid_deaths_df)
