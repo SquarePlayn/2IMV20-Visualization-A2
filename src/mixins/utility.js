@@ -43,7 +43,7 @@ export const utility = {
      */
     formatDate(intDate) {
       // Make really sure it's an int (and not e.g. a string)
-      const intDateParsed = Number(intDate) + 10;
+      const intDateParsed = Number(intDate);
 
       // Construct date `intDate` days from start of dataset
       const date = new Date('2020-01-22');
