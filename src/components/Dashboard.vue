@@ -26,7 +26,7 @@
         <time-controls v-model="time"/>
 
         <!-- Emission Graph -->
-        <emission :data="data" :settings="settings" :time="time"/>
+        <emission :data="data" :settings="settings" :time="time" :selectedCountry="selectedCountry"/>
       </b-col>
 
       <!-- Emission Excerpt -->

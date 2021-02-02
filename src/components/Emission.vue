@@ -11,7 +11,7 @@ import { utility } from "../mixins/utility";
 
 export default {
   name: "Emission",
-  props: ['data', 'settings', 'time'],
+  props: ['data', 'settings', 'time', 'selectedCountry'],
   mixins: [utility],
   data() {
     return {
@@ -32,6 +32,20 @@ export default {
             text: 'CO2 emissions (metric tons)'
           }
         },
+        colors: [
+          '#74dff8',
+          '#769CDD',
+          '#9da9d0',
+          '#4193ca',
+          '#4933ff',
+          '#dcf7c3',
+          '#62883f',
+          '#0b955b',
+          '#8dea6b',
+          '#aad5b2',
+          '#37553d',
+          '#12076d',
+        ],
         plotOptions: {
           area: {
             stacking: 'normal',
@@ -60,10 +74,74 @@ export default {
 
   watch: {
     time: 'reloadChart',
-    'settings.emissionSplit.selected':  'updateChart'
+    'settings.emissionSplit.selected':  'updateChart',
+    'selectedCountry.selected':  'emissionCountry',
   },
 
   methods: {
+
+    emissionCountry(){
+      if (this.settings.emissionSplit.selected === 'sector' && this.selectedCountry.selected !== null){
+        while(this.chartOptions.series.length > 0)
+          this.chartOptions.series.pop();
+        const PowerData = [];
+        const GroundTransportData = [];
+        const DomesticAviationData = [];
+        const IndustryData = [];
+        const ResidentialData = [];
+        for (let date in this.data) {
+          let power = 0;
+          let gt = 0;
+          let da = 0;
+          let ind = 0;
+          let res = 0;
+
+          if (this.data[date][this.selectedCountry.selected]['Has Carbon'] === true)
+          {
+            power = this.data[date][this.selectedCountry.selected]['Power'];
+            gt = this.data[date][this.selectedCountry.selected]['Ground Transport'];
+            da = this.data[date][this.selectedCountry.selected]['Domestic Aviation'];
+            ind = this.data[date][this.selectedCountry.selected]['Industry'];
+            res = this.data[date][this.selectedCountry.selected]['Residential'];
+          }
+          PowerData.push([Date.parse(date), power]);
+          GroundTransportData.push([Date.parse(date), gt]);
+          DomesticAviationData.push([Date.parse(date), da]);
+          ResidentialData.push([Date.parse(date), res]);
+          IndustryData.push([Date.parse(date), ind]);
+        }
+
+        this.chartOptions.series.push({
+          name: 'Domestic Aviation',
+          data: DomesticAviationData,
+        });
+        this.chartOptions.series.push({
+          name: 'Residential',
+          data: ResidentialData,
+        });
+        this.chartOptions.series.push({
+          name: 'Ground Transport',
+          data: GroundTransportData,
+        });
+        this.chartOptions.series.push({
+          name: 'Industry',
+          data: IndustryData,
+        });
+        this.chartOptions.series.push({
+          name: 'Power',
+          data: PowerData,
+        });
+        if (this.selectedCountry.selected === 'World') this.chartOptions.title.text = 'Emission Levels in other countries'
+        else this.chartOptions.title.text = 'Emission Levels in ' + this.selectedCountry.selected;
+
+      }
+      else if (this.selectedCountry.selected == null)
+      {
+        this.updateChart();
+      }
+    },
+
+
     reloadChart(){
       this.chartOptions.xAxis.plotLines.pop();
       this.chartOptions.xAxis.plotLines.push({
@@ -79,14 +157,12 @@ export default {
         this.chartOptions.series.pop();
       if (this.settings.emissionSplit.selected === 'country')
       {
-         //const randomData = [];
          for (let date in this.data){ //date will be the second param
            for (let country in this.data[date]) // country will be the name of the series
            {
              // check if a country has emission data
-             if (this.data[date][country]['Has Covid'] === true && country !== 'World' ) // have to change to Has Carbon when the dataset is fixed
+             if (this.data[date][country]['Has Carbon'] === true) // have to change to Has Carbon when the dataset is fixed
              {
-
                let count = 0;
                let index = 0;
                for (let i = 0; i < this.chartOptions.series.length; i++){
@@ -111,6 +187,7 @@ export default {
              }
            }
          }
+        this.chartOptions.title.text = 'Emission Levels in the world';
       }
       else if (this.settings.emissionSplit.selected === 'sector') {
 
@@ -129,7 +206,7 @@ export default {
 
           for (let country in this.data[date])
           {
-            if (this.data[date][country]['Has Covid'] === true) // has to be changed to Has Carbon when the dataset is fixed
+            if (this.data[date][country]['Has Covid'] === true) // have to change
             // name of the series is the name of the array
             {
               power += this.data[date][country]['Power'];
@@ -167,6 +244,8 @@ export default {
           name: 'Power',
           data: PowerData,
         });
+
+        this.chartOptions.title.text = 'Emission Levels in the world';
       }
     },
 

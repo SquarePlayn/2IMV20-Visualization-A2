@@ -10,14 +10,8 @@
 import Highcharts from 'highcharts'
 import stockInit from 'highcharts/modules/stock'
 import { utility } from "../mixins/utility";
-import * as topojson from "topojson/dist/topojson";
 
 stockInit(Highcharts)
-
-// Get the data of the selected day
-//const dateFormatted = this.formatDate(this.time);
-//const dateData = this.data[dateFormatted];
-
 
 export default {
   name: "EmissionExcerpt",
@@ -30,7 +24,7 @@ export default {
           type: "column",
         },
         title: {
-          text: "CO2 emission per sector in the World " + this.formatDate(this.time),
+          text: "CO2 emission per sector in the whole World " + this.formatDate(this.time),
         },
         yAxis: {
           title: {
@@ -70,7 +64,7 @@ export default {
 
   watch: {
     time: 'updateChart',
-    'selectedCountry.selected':  'updateChart'
+    'selectedCountry.selected':  'updateChart',
   },
 
   mounted() {
@@ -90,7 +84,7 @@ export default {
 
       for (let country in dateData)
       {
-        if (dateData[country]['Has Covid'] === true) // has to be changed to Has Carbon when the dataset is fixed
+        if (dateData[country]['Has Carbon'] === true)
         {
           power += dateData[country]['Power'];
           gt += dateData[country]['Ground Transport'];
@@ -99,6 +93,7 @@ export default {
           res += dateData[country]['Residential'];
         }
       }
+      console.log(dateData);
 
       if (this.chartOptions.series.length === 0)
       {
@@ -110,6 +105,7 @@ export default {
       else
       {
         this.chartOptions.series[0].data = [power, gt, ind, res, da];
+        this.chartOptions.title.text = "CO2 emission per sector in the whole World " + this.formatDate(this.time);
       }
     },
 
@@ -117,11 +113,12 @@ export default {
 
       const dateFormatted = this.formatDate(this.time);
       const dateData = this.data[dateFormatted];
-      if (this.selectedCountry.selected !== 'country')
+      if (this.selectedCountry.selected !== 'country' && this.selectedCountry.selected !== null)
       {
         const countryData = dateData[this.selectedCountry.selected];
         this.chartOptions.series[0].data = [countryData['Power'], countryData['Ground Transport'], countryData['Industry'], countryData['Residential'], countryData['Domestic Aviation']];
-        this.chartOptions.title.text = "CO2 emission per sector in " + this.selectedCountry.selected + ' ' + this.formatDate(this.time);
+        if (this.selectedCountry.selected === 'World') this.chartOptions.title.text = 'CO2 emission per sector in other countries ' + this.formatDate(this.time)
+        else this.chartOptions.title.text = 'CO2 emission per sector in ' + this.selectedCountry.selected + ' ' + this.formatDate(this.time);
       }
       else {
         this.loadInitialData();
