@@ -1,8 +1,9 @@
 <template>
   <b-row>
-    <svg class="w-100 h-100 world-map">
+    <svg class="w-100 h-100 world-map" id="world-map">
       <g id="svg-world"/>
       <g id="svg-centers"/>
+      <g id="world-label"/>
     </svg>
   </b-row>
 </template>
@@ -11,9 +12,10 @@
 import * as d3 from 'd3/dist/d3';
 import * as topojson from 'topojson/dist/topojson';
 import { utility } from "../mixins/utility";
+import _ from 'lodash';
 
 export default {
-  name: "WorldMap",
+  me: "WorldMap",
   props: ['data', 'settings', 'time'],
   mixins: [utility],
 
@@ -25,6 +27,7 @@ export default {
 
       // Currently selected country
       selected: null,
+      hovered: null,
 
       // Geo coordinates to 2d coordinates projection
       projection: d3.geoMercator().scale(140).translate([1250 / 2, 460 / 1.4])
@@ -32,12 +35,12 @@ export default {
   },
 
   computed: {
-    width() {
-      return 1250;
+    dateData() {
+      return this.data[this.formatDate(this.time)];
     },
 
-    height() {
-      return 460;
+    prevDateData() {
+      return this.data[this.formatDate(this.time - 10)];
     },
   },
 
@@ -48,6 +51,8 @@ export default {
   watch: {
     time: 'updateMap',
     'settings.covidCount.selected': 'updateMap',
+    selected: 'updateMap',
+    hovered: 'updateMap',
   },
 
   methods: {
@@ -72,8 +77,33 @@ export default {
         })
     },
 
+    /**
+     * Get the data of the selected day of a country
+     * @param countryName
+     * @param prev
+     * @return Object
+     */
+    getDateDataOfCountry(countryName, prev) {
+      countryName = this.convertCountryName(countryName);
+      if (!(countryName in this.dateData)) {
+        console.error("Missing data for country '" + countryName + "'.");
+        return null;
+      }
+      const data = prev ? this.prevDateData : this.dateData;
+      return data[countryName];
+    },
+
+    /**
+     * Check whether a country should be possible to be clicked / selected
+     * @param countryName
+     * @return boolean
+     */
+    isClickable(countryName) {
+      // TODO Switch back to "Has Carbon" once dataset is fixed
+      return this.getDateDataOfCountry(countryName)["Has Covid"];
+    },
+
     createWorld() {
-      const that = this;
       const g = d3.select('#svg-world');
       const path = d3.geoPath(this.projection);
       g.selectAll('.country')
@@ -82,32 +112,62 @@ export default {
         .append('path')
         .attr('class', 'country')
         .attr('d', path)
-        .on('click', function(d) {
+        .on('click', (event, d) => {
           // On clicking a country, give it the selected class and store it in the selected variable
-          d3.select(this).classed('selected', true);
-          if (that.selected) {
-            d3.select(that.selected).classed('selected', false);
+          const name = this.convertCountryName(d.properties.name);
+          if (this.isClickable(name)) { // But only if this is a clickable country
+            if (this.selected === name) {
+              // It was already selected, unselect it
+              this.selected = null;
+            } else {
+              // Select it
+              this.selected = name;
+            }
           }
-          that.selected = this;
         })
-        .on('mouseover', function(d) {
+        .on('mouseover', (event, d) => {
           // Detect hovering over
-          d3.select(this).classed("hovered", true);
+          if (this.isClickable(d.properties.name)) {
+            this.hovered = this.convertCountryName(d.properties.name);
+          }
         })
-        .on('mouseout', function(d) {
-          // Reset hovered when moving mouse away
-          d3.select(this).classed("hovered", false);
-        })
-      ;
+        .on('mouseout', (event, d) => {
+          if (this.isClickable(d.properties.name)) {
+            // Reset hovered when moving mouse away
+            this.hovered = null;
+          }
+        });
+
+      // Make the map zoomable and pannable
+      d3.select("#world-map")
+        .call(d3.zoom().on("zoom", function (event) {
+          d3.select('#svg-world').attr("transform", event.transform);
+          d3.select('#svg-centers').attr("transform", event.transform);
+          d3.select('#world-label').attr("transform", event.transform);
+        }));
+
+      // Set them to the right properties for the current time
+      this.updateMap();
     },
 
     createCenters() {
       //  https://developers.google.com/public-data/docs/canonical/countries_csv
 
+      // Filter out only countries that have center data
+      const countryCoords = _.map(
+        _.filter(
+          this.dateData,
+          country => this.isClickable(country["Country"])
+        ), country => ({
+          long: country["Country"] === 'World' ? -140 : country["Long"],
+          lat: country["Country"] === 'World' ? -20 : country["Lat"],
+          name: country["Country"],
+        }));
+
       // Create the circles
       d3.select('#svg-centers')
         .selectAll('.country-center')
-        .data(this.centers)
+        .data(countryCoords)
         .enter()
         .append('circle')
         .attr('class', 'country-center')
@@ -118,58 +178,96 @@ export default {
         })
         .attr('cy', (d) => {
           return this.projection([d.long, d.lat])[1];
+        })
+        .on('click', (event, d) => {
+          const name = d.name;
+          if (this.selected === name) {
+            // It was already selected, unselect it
+            this.selected = null;
+          } else {
+            // Select it
+            this.selected = name;
+          }
+          this.updateMap();
+        })
+        .on('mouseover', (event, d) => {
+          // Detect hovering over
+          this.hovered = d.name;
+        })
+        .on('mouseout', (event, d) => {
+          this.hovered = null;
         });
+
+      // Create the label above the World circle
+      const textLong = -140;
+      const textLat = 15;
+      d3.select('#world-label')
+        .selectAll('.world-label')
+        .data(["World other"])
+        .enter()
+        .append("svg:text")
+        .text((d) => d)
+        .attr('class', 'world-label')
+        .attr('x', () => this.projection([textLong, textLat])[0])
+        .attr('y', () => this.projection([textLong, textLat])[1])
 
       // Set them to the right properties for the current time
       this.updateMap();
     },
 
+    getColumnFromMetric(metric) {
+      const lookup = {
+        'Confirmed': 'Confirmed Rolling Per Capita',
+        'Recovered': 'Recovered Rolling Per Capita',
+        'Deaths': 'Deaths Rolling Per Capita',
+      };
+      return lookup[metric];
+    },
+
     updateMap() {
-      // Get the data of the selected day
-      const dateFormatted = this.formatDate(this.time);
-      const dateData = this.data[dateFormatted];
-
-      // Get the data of yesterday, if possible
-      const dateYesterday = this.formatDate(this.time - 1);
-      const yesterdayData = this.data[dateYesterday];
-
       // If there is no data for this date, don't do anything
-      if (dateData === undefined) {
-        console.log("Missing date: " + dateFormatted);
+      if (this.dateData === undefined) {
+        console.log("Missing date: " + this.formatDate(this.time));
         return;
       }
-      if (yesterdayData === undefined) {
-        // If yesterday is undefined, also don't do anything but no logging
-        return;
-      }
+
+      // Update the countries
+      d3.select("#svg-world")
+        .selectAll('path')
+        .classed('selected', (d) => this.convertCountryName(d.properties.name) === this.selected)
+        .classed('hovered', (d) => this.convertCountryName(d.properties.name) === this.hovered)
+        .transition()
+        .duration(10)
+        .attr('fill', (d) => {
+          const countryData = this.getDateDataOfCountry(d.properties.name);
+          if (countryData === null) {
+            return '#ffffff';
+          }
+          const metric = this.settings.covidCount.selected;
+          const value = countryData[this.getColumnFromMetric(metric)];
+          return this.getCountryColor(value, metric);
+        });
 
       // Update the country circles
       d3.select('#svg-centers')
         .selectAll('circle')
+        .classed('selected-center', (d) => d.name === this.selected)
+        .classed('hovered', (d) => d.name === this.hovered)
         .transition()
         .duration(1)
         .attr('r', (d) => {
           // Size based on selected covid count
-          const countryData =  dateData[d.name];
-          const covidCount = countryData[this.settings.covidCount.selected];
-          return Math.sqrt(covidCount) / 100.0;
+          const countryData = this.getDateDataOfCountry(d.name);
+          const value = countryData['Total Emissions Rolling'];
+          return Math.sqrt(value * 50);
         })
         .attr('fill', (d) => {
           // Color based on change
-          const countryDataToday = dateData[d.name];
-          const countryDataYesterday = yesterdayData[d.name];
-          const covidCountToday = countryDataToday[this.settings.covidCount.selected];
-          const covidCountYesterday = countryDataYesterday[this.settings.covidCount.selected];
-
-          const change = (covidCountToday - covidCountYesterday) / covidCountYesterday;
-
-          const lower = -0.05;
-          const upper = 0.05;
-
-          const r = change < 0 ? 0 : 255 * (change / upper);
-          const g = change > 0 ? 0 : 255 * (change / lower);
-          const b = 0;
-          return `rgb(${r}, ${g}, ${b})`;
+          const curr = this.getDateDataOfCountry(d.name, false)['Total Emissions Rolling'];
+          const prev = this.getDateDataOfCountry(d.name, true)['Total Emissions Rolling'];
+          const diff = curr - prev;
+          const perc = diff / prev;
+          return this.getCountryColor(perc, 'emission change');
         });
     },
   }
@@ -179,14 +277,13 @@ export default {
 <style scoped>
 .world-map {
   min-height: 48vh;
-  background-color: lightblue;
+  background-color: white;
   border: 1px solid gray;
 }
 </style>
 
 <style>
 .country {
-  fill: #cccccc;
   stroke: #333333;
   stroke-width: 0.5;
 }
@@ -200,7 +297,16 @@ export default {
   fill: yellow !important;
 }
 
+.selected-center {
+    stroke: yellow !important;
+}
+
 .hovered {
   fill: gray;
+}
+
+.world-label {
+  text-anchor: middle;
+  font-size: 20pt;
 }
 </style>
