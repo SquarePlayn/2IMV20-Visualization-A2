@@ -76,8 +76,8 @@ export const utility = {
         upper = 0.0002;
       }
 
-      const r = value < 0 ? 0 : 255 * (value / upper);
-      const g = value > 0 ? 0 : 255 * (value / lower);
+      const r = value < 0 ? 0 : 255 * (value / upper) ** 0.25;
+      const g = value > 0 ? 0 : 255 * (value / lower) ** 0.25;
       const b = 0;
       return `rgb(${r}, ${g}, ${b})`;
     },

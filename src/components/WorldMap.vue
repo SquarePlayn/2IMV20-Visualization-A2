@@ -277,7 +277,7 @@ export default {
 <style scoped>
 .world-map {
   min-height: 48vh;
-  background-color: white;
+  background-color: lightsteelblue;
   border: 1px solid gray;
 }
 </style>
