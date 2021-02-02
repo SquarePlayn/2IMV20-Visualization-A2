@@ -16,7 +16,7 @@
       <!-- Selectors -->
       <b-col cols="2" align-h="right">
         <!-- Legend -->
-        <map-legend />
+        <map-legend :covid-metric="this.settings.covidCount.selected"/>
         <!-- Selectors -->
         <selectors :settings="settings"/>
       </b-col>
