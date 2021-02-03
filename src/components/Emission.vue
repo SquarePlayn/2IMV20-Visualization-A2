@@ -206,7 +206,7 @@ export default {
 
           for (let country in this.data[date])
           {
-            if (this.data[date][country]['Has Covid'] === true) // have to change
+            if (this.data[date][country]['Has Carbon'] === true)
             // name of the series is the name of the array
             {
               power += this.data[date][country]['Power'];
