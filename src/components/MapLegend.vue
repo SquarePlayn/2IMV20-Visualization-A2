@@ -25,67 +25,73 @@
     label: 'Covid cases per capita',
     ifMetric: 'Confirmed',
     values: [{
-      img: 'covid-high.png',
+      img: 'cases-high.png',
       val: '0.0002',
     }, {
-      img: 'covid-high.png',
+      img: 'cases-middle.png',
       val: '0.0001',
     },{
-      img: 'covid-high.png',
+      img: 'covid-0.png',
       val: '0',
     },]
   }, {
     label: 'Covid recoveries per capita',
     ifMetric: 'Recovered',
     values: [{
-      img: 'covid-high.png',
-      val: '0.0002',
+      img: 'recovered-high.png',
+      val: '0.0.00001',
     }, {
-      img: 'covid-high.png',
-      val: '0.0001',
+      img: 'recovered-middle.png',
+      val: '0.000005',
     },{
-      img: 'covid-high.png',
+      img: 'covid-0.png',
       val: '0',
     },]
   }, {
     label: 'Covid deaths per capita',
     ifMetric: 'Deaths',
     values: [{
-      img: 'covid-high.png',
-      val: '0.0002',
+      img: 'deaths-high.png',
+      val: '0.000008',
     }, {
-      img: 'covid-high.png',
-      val: '0.0001',
+      img: 'deaths-middle.png',
+      val: '0.000004',
     },{
-      img: 'covid-high.png',
+      img: 'covid-0.png',
       val: '0',
     },]
   }, {
     label: 'CO2 emission (metric ton)',
     ifMetric: null,
     values: [{
-      img: 'covid-high.png',
-      val: '0.0002',
+      img: 'emission-high.png',
+      val: 'x',
     }, {
-      img: 'covid-high.png',
-      val: '0.0001',
+      img: 'emission-middle.png',
+      val: 'y',
     },{
-      img: 'covid-high.png',
-      val: '0',
+      img: 'emission-low.png',
+      val: 'z',
     },]
   }, {
     label: 'Difference in CO2 emission from 1 year earlier',
     ifMetric: null,
     values: [{
-      img: 'covid-high.png',
-      val: '0.0002',
+      img: 'diff-best.png',
+      val: 'x-y',
     }, {
-      img: 'covid-high.png',
-      val: '0.0001',
+      img: 'diff-good.png',
+      val: 'x-y',
     },{
-      img: 'covid-high.png',
-      val: '0',
-    },]
+      img: 'diff-neutral.png',
+      val: 'x-y',
+    },{
+      img: 'diff-bad.png',
+      val: 'x-y',
+    },{
+      img: 'diff-worst.png',
+      val: 'x-y',
+    }]
   }];
 
   export default {

@@ -93,7 +93,7 @@ export default {
      * @return boolean
      */
     isClickable(countryName) {
-      return false;//this.getDateDataOfCountry(countryName)["Has Carbon"];
+      return this.getDateDataOfCountry(countryName)["Has Carbon"];
     },
 
     createWorld() {
