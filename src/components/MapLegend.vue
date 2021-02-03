@@ -5,8 +5,9 @@
                 <!-- Country color: covid metric per capita. 0, 0.0001, 0.0002 -->
                 <b-row class="legend-header pt-3">
                     <h5>{{ topic.label }}</h5>
+                     <span class="text-muted">{{  topic.subtitle }}</span>
                 </b-row>
-                <b-row align-v="center" v-for="value in topic.values" :key="value.img">
+                <b-row align-v="center" v-for="value in topic.values" :key="value.img" class="p-1">
                     <b-col cols="4">
                         <b-img class="legend-img" :src="'img/' + value.img"/>
                     </b-col>
@@ -23,13 +24,14 @@
 <script>
   const TOPICS = [{
     label: 'Covid cases per capita',
+    subtitle: 'Per 100.000 people per day',
     ifMetric: 'Confirmed',
     values: [{
       img: 'cases-high.png',
-      val: '0.0002',
+      val: '20',
     }, {
       img: 'cases-middle.png',
-      val: '0.0001',
+      val: '10',
     },{
       img: 'covid-0.png',
       val: '0',
