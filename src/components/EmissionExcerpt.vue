@@ -23,7 +23,7 @@ export default {
           backgroundColor: 'whitesmoke',
         },
         title: {
-          text: "CO2 emission per sector in the whole World " + this.formatDate(this.time),
+          text: "CO2 emission per sector in<br/>the whole World<br/>at " + this.formatDate(this.time),
         },
         yAxis: {
           title: {
@@ -104,7 +104,7 @@ export default {
       else
       {
         this.chartOptions.series[0].data = [power, gt, ind, res, da];
-        this.chartOptions.title.text = "CO2 emission per sector in the whole World " + this.formatDate(this.time);
+        this.chartOptions.title.text = "CO2 emission per sector in<br/>the whole World<br/>at " + this.formatDate(this.time);
       }
     },
 
@@ -116,8 +116,8 @@ export default {
       {
         const countryData = dateData[this.selectedCountry.selected];
         this.chartOptions.series[0].data = [countryData['Power'], countryData['Ground Transport'], countryData['Industry'], countryData['Residential'], countryData['Domestic Aviation']];
-        if (this.selectedCountry.selected === 'World') this.chartOptions.title.text = 'CO2 emission per sector in other countries ' + this.formatDate(this.time)
-        else this.chartOptions.title.text = 'CO2 emission per sector in ' + this.selectedCountry.selected + ' ' + this.formatDate(this.time);
+        if (this.selectedCountry.selected === 'World') this.chartOptions.title.text = 'CO2 emission per sector in<br/>other countries<br/> at' + this.formatDate(this.time)
+        else this.chartOptions.title.text = 'CO2 emission per sector in<br/>' + this.selectedCountry.selected + '<br/>at ' + this.formatDate(this.time);
       }
       else {
         this.loadInitialData();
