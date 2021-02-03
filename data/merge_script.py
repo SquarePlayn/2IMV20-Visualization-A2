@@ -113,7 +113,8 @@ def create_population_df() -> pd.DataFrame():
     data.replace(mapping, inplace=True)
 
     data = data.append([{COUNTRY_COLUMN: "Taiwan*", POPULATION_COLUMN: 23_780_000},
-                        {COUNTRY_COLUMN: "World", POPULATION_COLUMN: 7_794_798_739}])
+                        {COUNTRY_COLUMN: "World", POPULATION_COLUMN: 7_794_798_739},
+                        {COUNTRY_COLUMN: "Eritrea", POPULATION_COLUMN: 3_575_320}])
     return data
 
 
