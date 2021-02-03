@@ -1,7 +1,7 @@
 <template>
-  <b-row class="emission-chart">
-      <highcharts class="hc" :options="chartOptions" ref="chart"></highcharts>
-  </b-row>
+    <b-row>
+        <highcharts class="emission-chart" :options="chartOptions" ref="chart"></highcharts>
+    </b-row>
 </template>
 
 <script>
@@ -255,7 +255,7 @@ export default {
 
 <style scoped>
 .emission-chart {
-  min-height: 45vh;
-  background-color: antiquewhite;
+  height: 45vh;
+  width: 100%;
 }
 </style>
