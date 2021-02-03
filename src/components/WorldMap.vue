@@ -196,7 +196,7 @@ export default {
       const textLat = 15;
       d3.select('#world-label')
         .selectAll('.world-label')
-        .data(["World other"])
+        .data(["Other countries"])
         .enter()
         .append("svg:text")
         .text((d) => d)
@@ -270,7 +270,7 @@ export default {
 <style scoped>
 .world-map {
   min-height: 48vh;
-  background-color: white;
+  background-color: lightblue;
   border: 1px solid gray;
 }
 </style>
