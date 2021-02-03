@@ -1,6 +1,6 @@
 <template>
     <b-row>
-        <highcharts class="emission-chart" :options="chartOptions" ref="chart"></highcharts>
+        <highcharts class="emission-chart" :options="chartOptions" ref="chart" />
     </b-row>
 </template>
 
@@ -22,6 +22,7 @@ export default {
         chart: {
           type: 'area',
           zoomType: 'x',
+          backgroundColor: 'whitesmoke',
         },
         xAxis: {
           type: 'datetime',

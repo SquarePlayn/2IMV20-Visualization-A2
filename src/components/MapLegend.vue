@@ -25,7 +25,7 @@
 
 <script>
   const TOPICS = [{
-    label: 'Covid cases per capita',
+    label: 'Covid cases',
     subtitle: 'Per 100.000 people per day',
     ifMetric: 'Confirmed',
     values: [{

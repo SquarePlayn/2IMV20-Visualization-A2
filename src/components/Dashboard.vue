@@ -1,7 +1,7 @@
 <template>
   <b-container
       fluid
-      class="main-container h-100 d-flex flex-column"
+      class="main-container h-100"
   >
     <!-- Header -->
     <!-- (Disabled)
@@ -10,8 +10,10 @@
     </b-row>
     -->
     <!-- Main content -->
-    <b-spinner v-if="!dataLoaded"/>
-    <b-row v-else class="flex-grow-1">
+    <b-row v-if="!dataLoaded" class="justify-content-center pt-5">
+      <b-spinner />
+    </b-row>
+    <b-row v-else class="h-100">
 
       <!-- Selectors -->
       <b-col cols="2" align-h="right">
@@ -19,15 +21,22 @@
         <map-legend :covid-metric="this.settings.covidCount.selected"/>
       </b-col>
 
-      <b-col cols="8">
-        <!-- World Map -->
-        <world-map :data="data" :settings="settings" :time="time" :selectedCountry="selectedCountry"/>
+      <b-col cols="8" class="middle-col h-100 d-flex flex-column">
+        <b-row class="flex-grow-1">
+          <b-col>
+            <!-- World Map -->
+            <world-map :data="data" :settings="settings" :time="time" :selectedCountry="selectedCountry"/>
 
-        <!-- Time Controls -->
-        <time-controls v-model="time"/>
+            <!-- Time Controls -->
+            <time-controls v-model="time"/>
 
-        <!-- Emission Graph -->
-        <emission :data="data" :settings="settings" :time="time" :selectedCountry="selectedCountry"/>
+            <!-- Emission Graph -->
+            <emission :data="data" :settings="settings" :time="time" :selectedCountry="selectedCountry"/>
+          </b-col>
+        </b-row>
+        <b-row class="justify-content-center">
+          <app-footer/>
+        </b-row>
       </b-col>
 
       <b-col cols="2" align-h="left">
@@ -44,10 +53,6 @@
         <!-- Emission Excerpt -->
         <emission-excerpt :data="data" :settings="settings" :time="time" :selectedCountry="selectedCountry"/>
       </b-col>
-    </b-row>
-    <!-- Footer -->
-    <b-row>
-      <app-footer/>
     </b-row>
   </b-container>
 </template>
@@ -130,5 +135,10 @@ export default {
 <style scoped>
 .main-container {
   background-color: whitesmoke;
+}
+
+.middle-col {
+    border-left: 1px solid gray;
+    border-right: 1px solid gray;
 }
 </style>

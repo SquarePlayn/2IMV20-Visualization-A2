@@ -1,8 +1,6 @@
 <template>
    <b-row>
-      <b-col class="emission-excerpt">
-        <highcharts class="hc" :options="chartOptions" ref="chart"></highcharts>
-      </b-col>
+      <highcharts class="emission-excerpt hc" :options="chartOptions" ref="chart" />
     </b-row>
 </template>
 
@@ -22,6 +20,7 @@ export default {
       chartOptions: {
         chart: {
           type: "column",
+          backgroundColor: 'whitesmoke',
         },
         title: {
           text: "CO2 emission per sector in the whole World " + this.formatDate(this.time),
@@ -134,5 +133,6 @@ export default {
 .emission-excerpt {
   background-color: deepskyblue;
   height: 48vh;
+  width: 100%;
 }
 </style>
