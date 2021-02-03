@@ -3,9 +3,11 @@
         <b-col cols="12">
             <template v-for="topic in TOPICS" v-if="topic.ifMetric === null || topic.ifMetric === covidMetric">
                 <!-- Country color: covid metric per capita. 0, 0.0001, 0.0002 -->
-                <b-row class="legend-header pt-3">
-                    <h5>{{ topic.label }}</h5>
-                     <span class="text-muted">{{  topic.subtitle }}</span>
+                <b-row class="legend-header pt-2" no-gutters>
+                    <b-col>
+                        <h5>{{ topic.label }}</h5>
+                        <span class="text-muted">{{  topic.subtitle }}</span>
+                    </b-col>
                 </b-row>
                 <b-row align-v="center" v-for="value in topic.values" :key="value.img" class="p-1">
                     <b-col cols="4">
@@ -37,33 +39,36 @@
       val: '0',
     },]
   }, {
-    label: 'Covid recoveries per capita',
+    label: 'Covid recoveries',
+    subtitle: 'Per 100.000 people per day',
     ifMetric: 'Recovered',
     values: [{
       img: 'recovered-high.png',
-      val: '0.0.00001',
+      val: '1',
     }, {
       img: 'recovered-middle.png',
-      val: '0.000005',
+      val: '0.5',
     },{
       img: 'covid-0.png',
       val: '0',
     },]
   }, {
-    label: 'Covid deaths per capita',
+    label: 'Covid deaths',
+    subtitle: 'Per 100.000 people per day',
     ifMetric: 'Deaths',
     values: [{
       img: 'deaths-high.png',
-      val: '0.000008',
+      val: '0.8',
     }, {
       img: 'deaths-middle.png',
-      val: '0.000004',
+      val: '0.4',
     },{
       img: 'covid-0.png',
       val: '0',
     },]
   }, {
-    label: 'CO2 emission (metric ton)',
+    label: 'CO2 emission',
+    subtitle: 'Metric ton per day',
     ifMetric: null,
     values: [{
       img: 'emission-high.png',
@@ -76,7 +81,8 @@
       val: '0.5',
     },]
   }, {
-    label: 'Difference in CO2 emission from 1 year earlier',
+    label: 'Difference in CO2 emission',
+    subtitle: 'Compared to the same day last year',
     ifMetric: null,
     values: [{
       img: 'diff-best.png',
