@@ -72,23 +72,12 @@ export const utility = {
         getCountryColor(value, metric) {
             let lower, upper, r_a, g_a, b_a, r_b, g_b, b_b;
 
-            if (metric === 'emission change') {
-                lower = -0.35;
-                upper = 0.35;
-                r_a = 251;
-                g_a = 72;
-                b_a = 25;
-                r_b = 11;
-                g_b = 218;
-                b_b = 81;
-            } else {
-                r_a = 0;
-                g_a = 0;
-                b_a = 0;
-                r_b = 250;
-                g_b = 235;
-                b_b = 215;
-            }
+            r_a = 0;
+            g_a = 0;
+            b_a = 0;
+            r_b = 250;
+            g_b = 235;
+            b_b = 215;
 
             if (metric === 'Recovered') {
                 lower = 0;
@@ -121,6 +110,35 @@ export const utility = {
             b = intensity * b_a + (1 - intensity) * b_b;
 
             return `rgb(${r}, ${g}, ${b})`;
+        },
+
+        /**
+         * For a certain value of return an indicator color
+         * @param value
+         */
+        getEmissionCircleColor(value){
+
+            const extreme_range = 0.24;
+            const center_range = 0.08;
+
+            const best = `rgb(${86}, ${185}, ${77})`;
+            const good = `rgb(${168}, ${196}, ${73})`;  //
+            const neutral = `rgb(${255}, ${201}, ${75})`;
+            const bad = `rgb(${246}, ${136}, ${68})`;
+            const worst = `rgb(${237}, ${71}, ${64})`;
+
+            if (value < -extreme_range){
+                return best
+            } else if (value < -center_range){
+                return good
+            } else if (value < center_range) {
+                return neutral
+            } else if (value < extreme_range) {
+                return bad
+            } else {
+                return worst
+            }
+
         }
     },
 };
