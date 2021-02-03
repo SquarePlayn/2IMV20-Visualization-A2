@@ -291,7 +291,8 @@ export default {
 }
 
 .selected {
-  fill: yellow !important;
+  stroke-width: 2;
+  stroke: yellow !important;
 }
 
 .selected-center {
