@@ -264,7 +264,7 @@ export default {
           const prev = this.getDateDataOfCountry(d.name)['Last Year Emissions Rolling'];
           const diff = curr - prev;
           const perc = diff / prev;
-          return this.getCountryColor(perc, 'emission change');
+          return this.getEmissionCircleColor(perc);
         });
     },
   }
