@@ -16,7 +16,7 @@ import _ from 'lodash';
 
 export default {
   me: "WorldMap",
-  props: ['data', 'settings', 'time'],
+  props: ['data', 'settings', 'time', 'selectedCountry'],
   mixins: [utility],
 
   data() {
@@ -55,22 +55,22 @@ export default {
     loadCountryDatasets() {
       // Async loading of the countries data
       axios.get('data/countries-110m.json')
-        .then(response => {
-          // Save the data
-          const data = response.data;
-          this.countries = topojson.feature(data, data.objects.countries).features;
+          .then(response => {
+            // Save the data
+            const data = response.data;
+            this.countries = topojson.feature(data, data.objects.countries).features;
 
-          // Create the map
-          this.createWorld();
-        });
+            // Create the map
+            this.createWorld();
+          });
 
       axios.get('data/country-centers.json')
-        .then(response => {
-          //Save the data
-          this.centers = response.data.countries;
+          .then(response => {
+            //Save the data
+            this.centers = response.data.countries;
 
-          this.createCenters();
-        })
+            this.createCenters();
+          })
     },
 
     /**
@@ -111,10 +111,12 @@ export default {
           if (this.isClickable(name)) { // But only if this is a clickable country
             if (this.selected === name) {
               // It was already selected, unselect it
+              this.selectedCountry.selected = null;
               this.selected = null;
             } else {
-              // Select it
               this.selected = name;
+              // Select it
+              this.selectedCountry.selected = this.selected;
             }
           }
         })
@@ -177,9 +179,11 @@ export default {
           if (this.selected === name) {
             // It was already selected, unselect it
             this.selected = null;
+            this.selectedCountry.selected = null;
           } else {
             // Select it
             this.selected = name;
+            this.selectedCountry.selected = name;
           }
           this.updateMap();
         })

@@ -20,13 +20,13 @@
 
       <b-col cols="8">
         <!-- World Map -->
-        <world-map :data="data" :settings="settings" :time="time"/>
+        <world-map :data="data" :settings="settings" :time="time" :selectedCountry="selectedCountry"/>
 
         <!-- Time Controls -->
         <time-controls v-model="time"/>
 
         <!-- Emission Graph -->
-        <emission :data="data" :settings="settings" :time="time"/>
+        <emission :data="data" :settings="settings" :time="time" :selectedCountry="selectedCountry"/>
       </b-col>
 
       <!-- Emission Excerpt -->
@@ -34,7 +34,7 @@
         <b-row align-h="center" class="p-5">
           <h1>{{ new Date(formatDate(this.time)).toLocaleDateString() }}</h1>
         </b-row>
-        <emission-excerpt :data="data" :settings="settings" :time="time"/>
+        <emission-excerpt :data="data" :settings="settings" :time="time" :selectedCountry="selectedCountry"/>
       </b-col>
     </b-row>
     <!-- Footer -->
@@ -67,6 +67,11 @@ export default {
 
       time: 0,
 
+      selectedCountry: {
+        label: 'Country',
+        selected: null,
+      },
+
       settings: {
         // Split emission on [sector, country]
         emissionSplit: {
@@ -89,9 +94,6 @@ export default {
             {value: 'Deaths', text: 'Deaths'},
           ],
         },
-
-        // Select country (to display emission chart)
-        // TODO
       },
     };
   },
@@ -107,10 +109,10 @@ export default {
     loadData() {
       // Async loading of the data
       axios.get("data/dataset.json")
-        .then(response => {
-          this.data = response.data;
-          this.dataLoaded = true;
-        });
+          .then(response => {
+            this.data = response.data;
+            this.dataLoaded = true;
+          });
     },
   },
 };
