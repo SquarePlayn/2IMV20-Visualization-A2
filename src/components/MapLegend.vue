@@ -65,32 +65,32 @@
     ifMetric: null,
     values: [{
       img: 'emission-high.png',
-      val: 'x',
+      val: '12',
     }, {
       img: 'emission-middle.png',
-      val: 'y',
+      val: '2',
     },{
       img: 'emission-low.png',
-      val: 'z',
+      val: '0.5',
     },]
   }, {
     label: 'Difference in CO2 emission from 1 year earlier',
     ifMetric: null,
     values: [{
       img: 'diff-best.png',
-      val: 'x-y',
+      val: '> +24%',
     }, {
       img: 'diff-good.png',
-      val: 'x-y',
+      val: '+8% to +24%',
     },{
       img: 'diff-neutral.png',
-      val: 'x-y',
+      val: '-8% to +8%',
     },{
       img: 'diff-bad.png',
-      val: 'x-y',
+      val: '-8% to -24%',
     },{
       img: 'diff-worst.png',
-      val: 'x-y',
+      val: '< -24%',
     }]
   }];
 
