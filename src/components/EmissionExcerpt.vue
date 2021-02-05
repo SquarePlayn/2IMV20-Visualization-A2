@@ -92,7 +92,6 @@ export default {
           res += dateData[country]['Residential'];
         }
       }
-      console.log(dateData);
 
       if (this.chartOptions.series.length === 0)
       {
