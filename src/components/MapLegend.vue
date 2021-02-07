@@ -86,19 +86,19 @@
     ifMetric: null,
     values: [{
       img: 'diff-best.png',
-      val: '> +24%',
+      val: '< -24%',
     }, {
       img: 'diff-good.png',
-      val: '+8% to +24%',
-    },{
-      img: 'diff-neutral.png',
-      val: '-8% to +8%',
-    },{
-      img: 'diff-bad.png',
       val: '-8% to -24%',
     },{
+      img: 'diff-neutral.png',
+      val: '+8% to -8%',
+    },{
+      img: 'diff-bad.png',
+      val: '+8% to +24%',
+    },{
       img: 'diff-worst.png',
-      val: '< -24%',
+      val: '> +24%',
     }]
   }];
 

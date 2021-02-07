@@ -227,6 +227,11 @@ def preprocess_main_dataframe(total_df: pd.DataFrame) -> pd.DataFrame:
          COUNTRY_COLUMN, *base_categories, *all_categories, *[col + PER_CAPITA_SUFFIX for col in all_categories]]
     ]
 
+    total_df = total_df[[DATE_FANCY_COLUMN, DATE_COLUMN, "Last Year Emissions Rolling", "Total Emissions Rolling",
+                         "Deaths Rolling Per Capita", "Recovered Rolling Per Capita", "Confirmed Rolling Per Capita",
+                         "Country", "Long", "Lat", "Has Carbon", "Total Emissions", "Power", "Ground Transport",
+                         "Industry", "Residential", "Domestic Aviation"]]
+
     return total_df
 
 

@@ -92,7 +92,6 @@ export default {
           res += dateData[country]['Residential'];
         }
       }
-      console.log(dateData);
 
       if (this.chartOptions.series.length === 0)
       {
@@ -131,7 +130,6 @@ export default {
 
 <style scoped>
 .emission-excerpt {
-  background-color: deepskyblue;
   height: 48vh;
   width: 100%;
 }
