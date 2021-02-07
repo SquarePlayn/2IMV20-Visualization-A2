@@ -130,7 +130,6 @@ export default {
 
 <style scoped>
 .emission-excerpt {
-  background-color: deepskyblue;
   height: 48vh;
   width: 100%;
 }
