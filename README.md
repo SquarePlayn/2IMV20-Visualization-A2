@@ -1,5 +1,12 @@
 # 2IMV20-Visualization-A2
-A visualisation of the Corona cases and co2 emission worldwide over time
+A visualisation of the Corona cases and co2 emission worldwide over time.
+
+## Live demo
+[https://covid.pietervoors.com/](https://covid.pietervoors.com/)
+
+## Video demo
+[![Watch the video](https://img.youtube.com/vi/bOs_eBpP2m0/maxresdefault.jpg)](https://youtu.be/bOs_eBpP2m0)
+
 
 ## Installation
 - Make sure you have [NodeJS](https://nodejs.org/en/) installed.
